@@ -1,249 +1,207 @@
-# TikTok Video Downloader
+# Social Downloader
 
-A powerful and user-friendly Python application for downloading TikTok videos with both command-line and graphical interfaces.
+A comprehensive Python application for downloading videos from social media platforms and removing text overlays using AI/ML technology.
 
-## Features
+## 🚀 Features
 
-- **Multiple Interface Options**: Command-line interface for power users and GUI for beginners
-- **Batch Downloading**: Download multiple videos at once from a list of URLs
-- **Quality Selection**: Choose from various video qualities (best, worst, 720p, 480p, 360p)
-- **Audio Extraction**: Option to download audio only
-- **Metadata Support**: Automatically extract and save video metadata
-- **URL Validation**: Built-in validation for TikTok URLs
-- **Progress Tracking**: Real-time progress updates and logging
-- **Cross-Platform**: Works on Windows, macOS, and Linux
-- **Text Removal**: Remove text overlays from videos using AI-powered inpainting
-- **Video Processing**: Multiple text removal methods (inpaint, blur, crop)
+- **Video Downloading**: Download videos from TikTok and other social media platforms
+- **Text Removal**: AI-powered text overlay removal from videos
+- **GUI Applications**: User-friendly graphical interfaces for both downloading and text removal
+- **Interactive Tools**: Interactive text removal with real-time preview
+- **Batch Processing**: Process multiple videos efficiently
 
-## Installation
-
-### Prerequisites
-
-- Python 3.7 or higher
-- pip (Python package installer)
-
-### Step 1: Clone or Download
-
-```bash
-git clone <repository-url>
-cd social_downloader
-```
-
-Or download the files directly to your desired directory.
-
-### Step 2: Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### Step 3: Verify Installation
-
-```bash
-python tiktok_downloader.py --help
-```
-
-## Usage
-
-### Command Line Interface
-
-#### Single Video Download
-
-```bash
-# Basic download
-python tiktok_downloader.py --url "https://www.tiktok.com/@user/video/1234567890"
-
-# Download with specific quality
-python tiktok_downloader.py --url "https://www.tiktok.com/@user/video/1234567890" --quality 720p
-
-# Download audio only
-python tiktok_downloader.py --url "https://www.tiktok.com/@user/video/1234567890" --audio-only
-
-# Custom output directory
-python tiktok_downloader.py --url "https://www.tiktok.com/@user/video/1234567890" --output-dir "my_videos"
-```
-
-#### Batch Download
-
-Create a text file (e.g., `urls.txt`) with one TikTok URL per line:
+## 📁 Project Structure
 
 ```
-https://www.tiktok.com/@user1/video/1234567890
-https://www.tiktok.com/@user2/video/0987654321
-https://www.tiktok.com/@user3/video/1122334455
+social_downloader/
+├── main.py                 # Main entry point for the application
+├── requirements.txt        # Python dependencies
+├── .gitignore             # Git ignore file
+├── .DS_Store              # macOS system file
+│
+├── downloader/            # Video downloading functionality
+│   ├── __init__.py
+│   ├── tiktok_downloader.py  # Core TikTok downloader
+│   └── tiktok_gui.py         # GUI for video downloads
+│
+├── text_remover/          # Text removal functionality
+│   ├── __init__.py
+│   ├── video_text_remover.py      # Core text removal
+│   ├── text_remover_gui.py        # GUI for text removal
+│   └── interactive_text_remover.py # Interactive text remover
+│
+├── core/                  # Shared utilities and core functionality
+│   ├── __init__.py
+│   ├── example.py             # Example usage and demonstrations
+│   └── tiktok_downloader.log  # Application logs
+│
+├── gui/                   # GUI utilities and shared components
+│   └── __init__.py
+│
+├── tests/                 # Test files and testing utilities
+│   ├── __init__.py
+│   └── test_installation.py  # Installation and dependency tests
+│
+├── docs/                  # Documentation files
+│   ├── README.md              # Main documentation (this file)
+│   ├── QUICKSTART.md          # Quick start guide
+│   └── INTERACTIVE_GUIDE.md   # Interactive tool guide
+│
+├── downloads/             # Downloaded and processed content
+│   ├── original/          # Original downloaded videos
+│   ├── processed/         # Videos with text removed
+│   └── metadata/          # Video metadata (JSON, descriptions, images)
+│
+└── models/                # AI/ML models (currently empty)
 ```
 
-Then run:
+## 🛠️ Installation
 
-```bash
-python tiktok_downloader.py --file urls.txt
-```
+1. **Clone the repository**:
+   ```bash
+   git clone <repository-url>
+   cd social_downloader
+   ```
 
-#### Command Line Options
-
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--url` | Single TikTok video URL | - |
-| `--file` | Text file containing URLs (one per line) | - |
-| `--output-dir` | Output directory for downloaded videos | `downloads` |
-| `--quality` | Video quality preference | `best` |
-| `--audio-only` | Download audio only (no video) | False |
-| `--no-metadata` | Skip metadata extraction | False |
-
-### Graphical User Interface
-
-For users who prefer a graphical interface:
-
-```bash
-python tiktok_gui.py
-```
-
-#### GUI Features
-
-- **Single/Batch Mode**: Toggle between single URL and batch processing
-- **Clipboard Integration**: Paste URLs directly from clipboard
-- **File Browser**: Browse for output directory
-- **Real-time Logging**: See download progress and status
-- **Quality Selection**: Dropdown menu for quality options
-- **Options Panel**: Configure audio-only, metadata, and other settings
-
-### Text Removal
-
-Remove text overlays from videos using AI-powered inpainting:
-
-```bash
-# Command line
-python video_text_remover.py --input video.mp4 --output clean_video.mp4
-
-# GUI
-python text_remover_gui.py
-```
-
-#### Text Removal Methods
-
-- **Inpaint**: Best quality - fills text areas with surrounding content using AI
-- **Blur**: Fast processing - blurs text areas
-- **Crop**: Simple - crops top portion (if text is at top)
-
-#### Text Removal Features
-
-- **Automatic Detection**: Detects text regions using computer vision
-- **Multiple Methods**: Choose from inpaint, blur, or crop
-- **Preview Mode**: See detection results in real-time
-- **Batch Processing**: Process multiple videos
-- **Progress Tracking**: Real-time progress updates
-
-## Supported URL Formats
-
-The downloader supports various TikTok URL formats:
-
-- `https://www.tiktok.com/@username/video/1234567890`
-- `https://vm.tiktok.com/xxxxx/`
-- `https://vt.tiktok.com/xxxxx/`
-- `https://tiktok.com/@username/video/1234567890`
-
-## Output Structure
-
-Downloaded videos are saved with the following structure:
-
-```
-downloads/
-├── video_title.mp4              # Main video file
-├── video_title.jpg              # Thumbnail (if metadata enabled)
-├── video_title.description      # Video description (if metadata enabled)
-└── video_title.info.json        # Complete metadata (if metadata enabled)
-```
-
-## Error Handling
-
-The application includes comprehensive error handling:
-
-- **Invalid URLs**: Automatic validation and user feedback
-- **Network Issues**: Graceful handling of connection problems
-- **File System Errors**: Proper handling of permission and disk space issues
-- **Download Failures**: Detailed error messages and logging
-
-## Logging
-
-All operations are logged to both console and file:
-
-- **Console Output**: Colored output for immediate feedback
-- **Log File**: `tiktok_downloader.log` for detailed debugging
-- **GUI Log**: Real-time log display in the graphical interface
-
-## Troubleshooting
-
-### Common Issues
-
-1. **"Module not found" errors**
+2. **Install dependencies**:
    ```bash
    pip install -r requirements.txt
    ```
 
-2. **Download fails with "Video unavailable"**
-   - Check if the video is still available on TikTok
-   - Verify the URL is correct and accessible
-   - Some videos may be region-restricted
+3. **Test installation**:
+   ```bash
+   python tests/test_installation.py
+   ```
 
-3. **Permission errors**
-   - Ensure you have write permissions to the output directory
-   - Try running as administrator (Windows) or with sudo (Linux/macOS)
+## 🚀 Quick Start
 
-4. **GUI doesn't start**
-   - Ensure tkinter is installed: `python -m tkinter`
-   - On Linux: `sudo apt-get install python3-tk`
+### Using the Main Application
 
-### Performance Tips
+The application provides a unified command-line interface through `main.py`:
 
-- Use batch mode for multiple downloads
-- Choose appropriate quality settings to balance speed and file size
-- Close other applications to free up system resources
-- Use SSD storage for faster write speeds
+```bash
+# Show help
+python main.py --help
 
-## Legal and Ethical Considerations
+# Download a video
+python main.py downloader --url "https://tiktok.com/..." --output downloads/original/
 
-⚠️ **Important**: Please respect copyright laws and TikTok's Terms of Service:
+# Remove text from a video
+python main.py text-remover --input video.mp4 --output processed_video.mp4
 
-- Only download videos you have permission to download
-- Respect content creators' rights
-- Do not use downloaded content for commercial purposes without permission
-- This tool is for personal use and educational purposes only
+# Launch GUI applications
+python main.py gui --type downloader
+python main.py gui --type text-remover
+```
 
-## Contributing
+### Direct Module Usage
 
-Contributions are welcome! Please feel free to submit issues and pull requests.
+You can also run individual modules directly:
 
-### Development Setup
+#### Video Downloader
+```bash
+# Command line download
+python downloader/tiktok_downloader.py
+
+# GUI downloader
+python downloader/tiktok_gui.py
+```
+
+#### Text Remover
+```bash
+# Command line text removal
+python text_remover/video_text_remover.py
+
+# GUI text remover
+python text_remover/text_remover_gui.py
+
+# Interactive text remover
+python text_remover/interactive_text_remover.py
+```
+
+## 📖 Documentation
+
+- **[Quick Start Guide](docs/QUICKSTART.md)**: Get up and running quickly
+- **[Interactive Guide](docs/INTERACTIVE_GUIDE.md)**: Learn to use the interactive text remover
+- **[Core Examples](core/example.py)**: See example usage patterns
+
+## 🎯 Usage Examples
+
+### Downloading Videos
+
+```python
+from downloader.tiktok_downloader import download_video
+
+# Download a TikTok video
+download_video("https://tiktok.com/@user/video/123456789", "downloads/original/")
+```
+
+### Removing Text from Videos
+
+```python
+from text_remover.video_text_remover import remove_text_from_video
+
+# Remove text overlays from a video
+remove_text_from_video("input_video.mp4", "output_video.mp4")
+```
+
+## 🔧 Configuration
+
+### Download Settings
+- Default download directory: `downloads/original/`
+- Supported platforms: TikTok (expandable to other platforms)
+- Automatic metadata extraction
+
+### Text Removal Settings
+- AI/ML model-based text detection
+- Configurable confidence thresholds
+- Support for various text overlay types
+
+## 🧪 Testing
+
+Run the test suite to ensure everything is working correctly:
+
+```bash
+python tests/test_installation.py
+```
+
+## 📝 Logging
+
+Application logs are stored in `core/tiktok_downloader.log` and provide detailed information about:
+- Download progress and status
+- Text removal operations
+- Error messages and debugging information
+
+## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Acknowledgments
+## 🆘 Support
 
-- [yt-dlp](https://github.com/yt-dlp/yt-dlp) - The powerful video downloader library
-- [colorama](https://github.com/tartley/colorama) - Cross-platform colored terminal text
-- [tkinter](https://docs.python.org/3/library/tkinter.html) - Python's standard GUI library
+If you encounter any issues:
 
-## Support
+1. Check the [documentation](docs/)
+2. Review the [examples](core/example.py)
+3. Check the [logs](core/tiktok_downloader.log)
+4. Open an issue on GitHub
 
-If you encounter any issues or have questions:
+## 🔄 Updates
 
-1. Check the troubleshooting section above
-2. Review the log files for detailed error information
-3. Open an issue on the project repository
-4. Ensure you're using the latest version of the application
+Stay updated with the latest features and improvements by regularly pulling from the repository:
 
-## Version History
+```bash
+git pull origin main
+pip install -r requirements.txt --upgrade
+```
 
-- **v1.0.0**: Initial release with CLI and GUI interfaces
-- Basic video downloading functionality
-- Batch processing support
-- Quality and format options
-- Comprehensive error handling and logging
+---
+
+**Happy downloading and processing! 🎉**
