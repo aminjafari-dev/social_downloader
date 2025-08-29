@@ -1,0 +1,6 @@
+2025-08-29 17:14:19,878 - INFO - Starting download for URL: https://www.tiktok.com/@n1ckdorn/video/7541114718950296854
+2025-08-29 17:14:35,559 - INFO - Starting download for URL: https://www.tiktok.com/@n1ckdorn/video/7541114718950296854
+2025-08-29 17:15:19,944 - INFO - Download completed successfully
+2025-08-29 17:15:20,601 - ERROR - Download error: [0;31mERROR:[0m Unable to rename file: [Errno 2] No such file or directory: 'downloads/the guy in the background .mp4.part' -> 'downloads/the guy in the background .mp4'
+2025-08-29 17:16:14,015 - INFO - Starting download for URL: https://www.tiktok.com/@n1ckdorn/video/7541114718950296854
+2025-08-29 17:16:22,866 - INFO - Download completed successfully
