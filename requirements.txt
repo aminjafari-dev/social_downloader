@@ -3,3 +3,7 @@ yt-dlp>=2023.12.30
 requests>=2.31.0
 tkinter-tooltip>=1.0.0
 colorama>=0.4.6
+
+# Video Processing Requirements
+opencv-python>=4.8.0
+numpy>=1.24.0

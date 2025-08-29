@@ -12,6 +12,8 @@ A powerful and user-friendly Python application for downloading TikTok videos wi
 - **URL Validation**: Built-in validation for TikTok URLs
 - **Progress Tracking**: Real-time progress updates and logging
 - **Cross-Platform**: Works on Windows, macOS, and Linux
+- **Text Removal**: Remove text overlays from videos using AI-powered inpainting
+- **Video Processing**: Multiple text removal methods (inpaint, blur, crop)
 
 ## Installation
 
@@ -104,6 +106,32 @@ python tiktok_gui.py
 - **Real-time Logging**: See download progress and status
 - **Quality Selection**: Dropdown menu for quality options
 - **Options Panel**: Configure audio-only, metadata, and other settings
+
+### Text Removal
+
+Remove text overlays from videos using AI-powered inpainting:
+
+```bash
+# Command line
+python video_text_remover.py --input video.mp4 --output clean_video.mp4
+
+# GUI
+python text_remover_gui.py
+```
+
+#### Text Removal Methods
+
+- **Inpaint**: Best quality - fills text areas with surrounding content using AI
+- **Blur**: Fast processing - blurs text areas
+- **Crop**: Simple - crops top portion (if text is at top)
+
+#### Text Removal Features
+
+- **Automatic Detection**: Detects text regions using computer vision
+- **Multiple Methods**: Choose from inpaint, blur, or crop
+- **Preview Mode**: See detection results in real-time
+- **Batch Processing**: Process multiple videos
+- **Progress Tracking**: Real-time progress updates
 
 ## Supported URL Formats
 

@@ -4,3 +4,23 @@
 2025-08-29 17:15:20,601 - ERROR - Download error: [0;31mERROR:[0m Unable to rename file: [Errno 2] No such file or directory: 'downloads/the guy in the background .mp4.part' -> 'downloads/the guy in the background .mp4'
 2025-08-29 17:16:14,015 - INFO - Starting download for URL: https://www.tiktok.com/@n1ckdorn/video/7541114718950296854
 2025-08-29 17:16:22,866 - INFO - Download completed successfully
+2025-08-29 17:38:19,857 - INFO - Starting download for URL: https://www.tiktok.com/@ehfea/video/7536937672632192270?q=baby%20funny%20video&t=1756476351193
+2025-08-29 17:39:03,389 - INFO - Download completed successfully
+2025-08-29 17:42:09,901 - INFO - Starting download for URL: https://www.tiktok.com/@honeycrisp5/video/7498553027050163499?q=baby%20funny%20video&t=1756476351193
+2025-08-29 17:42:49,578 - ERROR - Download error: [0;31mERROR:[0m [download] Got error: [SYS] unknown error (_ssl.c:2559)
+2025-08-29 17:43:05,952 - INFO - Starting download for URL: https://www.tiktok.com/@honeycrisp5/video/7498553027050163499?q=baby%20funny%20video&t=1756476351193
+2025-08-29 17:43:56,124 - INFO - Download completed successfully
+2025-08-29 17:46:16,835 - INFO - Starting download for URL: https://www.tiktok.com/@honeycrisp5/video/7498553027050163499?q=baby%20funny%20video&t=1756476351193
+2025-08-29 17:46:20,338 - ERROR - Download error: [0;31mERROR:[0m [TikTok] 7498553027050163499: Requested format is not available. Use --list-formats for a list of available formats
+2025-08-29 17:46:41,701 - INFO - Starting download for URL: https://www.tiktok.com/@honeycrisp5/video/7498553027050163499?q=baby%20funny%20video&t=1756476351193
+2025-08-29 17:46:45,456 - ERROR - Download error: [0;31mERROR:[0m [TikTok] 7498553027050163499: Requested format is not available. Use --list-formats for a list of available formats
+2025-08-29 17:46:55,770 - INFO - Starting download for URL: https://www.tiktok.com/@honeycrisp5/video/7498553027050163499?q=baby%20funny%20video&t=1756476351193
+2025-08-29 17:47:03,198 - INFO - Download completed successfully
+2025-08-29 17:47:47,707 - INFO - Starting download for URL: https://www.tiktok.com/@honeycrisp5/video/7498553027050163499?q=baby%20funny%20video&t=1756476351193
+2025-08-29 17:48:33,150 - INFO - Download completed successfully
+2025-08-29 18:08:30,153 - INFO - Starting download for URL: https://www.tiktok.com/@n1ckdorn/video/7541114718950296854
+2025-08-29 18:09:04,291 - INFO - Download completed successfully
+2025-08-29 18:09:16,865 - INFO - Starting download for URL: https://www.tiktok.com/@n1ckdorn/video/7541114718950296854
+2025-08-29 18:09:29,598 - INFO - Download completed successfully
+2025-08-29 18:09:53,062 - INFO - Starting download for URL: https://www.tiktok.com/@n1ckdorn/video/7541114718950296854
+2025-08-29 18:10:10,914 - INFO - Download completed successfully
