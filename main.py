@@ -1,125 +1,140 @@
 #!/usr/bin/env python3
 """
-Social Downloader - Main Entry Point
+TikTok Video Downloader - Main Application
 
-This is the main entry point for the Social Downloader application.
-It provides a command-line interface to access different modules:
-- Video Downloader
-- Text Remover
-- GUI Applications
+This is the main entry point for the TikTok Video Downloader application.
+It provides functionality for downloading TikTok videos from URLs.
 
 Usage:
-    python main.py [module] [options]
-    
-Examples:
-    python main.py downloader --help
-    python main.py text-remover --help
-    python main.py gui
+    python main.py --help
+    python main.py download --url "https://tiktok.com/..."
+    python main.py download-batch --file urls.txt
 """
 
 import sys
 import argparse
+import logging
 from pathlib import Path
 
-# Add the project root to the Python path
-project_root = Path(__file__).parent
-sys.path.insert(0, str(project_root))
+# Add the downloader directory to the Python path
+sys.path.append(str(Path(__file__).parent / "downloader"))
+
+from downloader.tiktok_downloader import TikTokDownloader
+
+
+def setup_logging():
+    """Set up logging configuration."""
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler('tiktok_downloader.log'),
+            logging.StreamHandler(sys.stdout)
+        ]
+    )
+
 
 def main():
-    """Main entry point for the Social Downloader application."""
+    """Main function to handle command-line interface."""
     parser = argparse.ArgumentParser(
-        description="Social Downloader - Download and process social media videos",
+        description="TikTok Video Downloader - Download TikTok videos from URLs",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python main.py downloader --url "https://tiktok.com/..." --output downloads/
-  python main.py text-remover --input video.mp4 --output processed_video.mp4
-  python main.py gui
+  python main.py download --url "https://tiktok.com/@user/video/123456789"
+  python main.py download --url "https://tiktok.com/@user/video/123456789" --quality 720p
+  python main.py download-batch --file urls.txt --output-dir downloads
         """
     )
     
-    subparsers = parser.add_subparsers(dest='module', help='Available modules')
+    # Create subparsers for different commands
+    subparsers = parser.add_subparsers(dest='command', help='Available commands')
     
-    # Downloader module
-    downloader_parser = subparsers.add_parser('downloader', help='Download videos from social media platforms')
-    downloader_parser.add_argument('--url', help='URL of the video to download')
-    downloader_parser.add_argument('--output', default='downloads/original/', help='Output directory for downloads')
-    downloader_parser.add_argument('--gui', action='store_true', help='Launch downloader GUI')
+    # Download command
+    download_parser = subparsers.add_parser('download', help='Download a TikTok video')
+    download_parser.add_argument('--url', '-u', required=True, help='TikTok video URL')
+    download_parser.add_argument('--output-dir', default='downloads', help='Output directory')
+    download_parser.add_argument('--quality', default='best', help='Video quality (best, 720p, 480p, etc.)')
     
-    # Text remover module
-    text_remover_parser = subparsers.add_parser('text-remover', help='Remove text overlays from videos')
-    text_remover_parser.add_argument('--input', help='Input video file path')
-    text_remover_parser.add_argument('--output', help='Output video file path')
-    text_remover_parser.add_argument('--gui', action='store_true', help='Launch text remover GUI')
-    text_remover_parser.add_argument('--interactive', action='store_true', help='Launch interactive text remover')
-    
-    # GUI module
-    gui_parser = subparsers.add_parser('gui', help='Launch GUI applications')
-    gui_parser.add_argument('--type', choices=['downloader', 'text-remover', 'all'], 
-                           default='all', help='Type of GUI to launch')
+    # Batch download command
+    batch_parser = subparsers.add_parser('download-batch', help='Download multiple TikTok videos')
+    batch_parser.add_argument('--file', '-f', required=True, help='File containing TikTok URLs (one per line)')
+    batch_parser.add_argument('--output-dir', default='downloads', help='Output directory')
+    batch_parser.add_argument('--quality', default='best', help='Video quality (best, 720p, 480p, etc.)')
     
     args = parser.parse_args()
     
-    if not args.module:
-        parser.print_help()
-        return
+    # Set up logging
+    setup_logging()
     
-    try:
-        if args.module == 'downloader':
-            handle_downloader(args)
-        elif args.module == 'text-remover':
-            handle_text_remover(args)
-        elif args.module == 'gui':
-            handle_gui(args)
-    except ImportError as e:
-        print(f"Error: Could not import required module. {e}")
-        print("Please ensure all dependencies are installed: pip install -r requirements.txt")
-    except Exception as e:
-        print(f"Error: {e}")
-
-def handle_downloader(args):
-    """Handle downloader module execution."""
-    if args.gui:
-        # Launch downloader GUI
-        from downloader.tiktok_gui import main as gui_main
-        gui_main()
-    elif args.url:
-        # Command line download
-        from downloader.tiktok_downloader import download_video
-        download_video(args.url, args.output)
+    if args.command == 'download':
+        print(f"Downloading video from: {args.url}")
+        
+        # Initialize downloader
+        downloader = TikTokDownloader(output_dir=args.output_dir, quality=args.quality)
+        
+        try:
+            # Download video
+            success = downloader.download_video(args.url)
+            
+            if success:
+                print(f"✅ Successfully downloaded video to: {args.output_dir}")
+            else:
+                print("❌ Failed to download video")
+                sys.exit(1)
+                
+        except Exception as e:
+            print(f"❌ Error during download: {e}")
+            sys.exit(1)
+    
+    elif args.command == 'download-batch':
+        print(f"Downloading videos from file: {args.file}")
+        
+        # Check if file exists
+        if not Path(args.file).exists():
+            print(f"❌ File not found: {args.file}")
+            sys.exit(1)
+        
+        # Read URLs from file
+        try:
+            with open(args.file, 'r') as f:
+                urls = [line.strip() for line in f if line.strip()]
+        except Exception as e:
+            print(f"❌ Error reading file: {e}")
+            sys.exit(1)
+        
+        if not urls:
+            print("❌ No URLs found in file")
+            sys.exit(1)
+        
+        print(f"Found {len(urls)} URLs to download")
+        
+        # Initialize downloader
+        downloader = TikTokDownloader(output_dir=args.output_dir, quality=args.quality)
+        
+        try:
+            # Download videos
+            results = downloader.download_multiple_videos(urls)
+            
+            successful = sum(results.values())
+            print(f"✅ Successfully downloaded {successful}/{len(urls)} videos")
+            
+            # Show failed downloads
+            failed_urls = [url for url, success in results.items() if not success]
+            if failed_urls:
+                print(f"❌ Failed downloads ({len(failed_urls)}):")
+                for url in failed_urls:
+                    print(f"  - {url}")
+                
+        except Exception as e:
+            print(f"❌ Error during batch download: {e}")
+            sys.exit(1)
+    
     else:
-        print("Please provide either --url for command line download or --gui for GUI mode")
+        # No command specified, show help
+        parser.print_help()
 
-def handle_text_remover(args):
-    """Handle text remover module execution."""
-    if args.gui:
-        # Launch text remover GUI
-        from text_remover.text_remover_gui import main as gui_main
-        gui_main()
-    elif args.interactive:
-        # Launch interactive text remover
-        from text_remover.interactive_text_remover import main as interactive_main
-        interactive_main()
-    elif args.input and args.output:
-        # Command line text removal
-        from text_remover.video_text_remover import remove_text_from_video
-        remove_text_from_video(args.input, args.output)
-    else:
-        print("Please provide --input and --output for command line processing, or --gui/--interactive for GUI modes")
-
-def handle_gui(args):
-    """Handle GUI module execution."""
-    if args.type == 'downloader':
-        from downloader.tiktok_gui import main as gui_main
-        gui_main()
-    elif args.type == 'text-remover':
-        from text_remover.text_remover_gui import main as gui_main
-        gui_main()
-    elif args.type == 'all':
-        print("Launching all GUI applications...")
-        print("Note: You may need to run them separately due to GUI limitations")
-        print("Use: python main.py gui --type downloader")
-        print("Use: python main.py gui --type text-remover")
 
 if __name__ == "__main__":
     main()
+

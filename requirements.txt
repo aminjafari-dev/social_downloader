@@ -1,18 +1,17 @@
-# TikTok Video Downloader Requirements
+# TikTok Video Search and Download Requirements
+
+# Core Dependencies
 yt-dlp>=2023.12.30
 requests>=2.31.0
-tkinter-tooltip>=1.0.0
 colorama>=0.4.6
-
-# Video Processing Requirements
-opencv-python>=4.8.0
-numpy>=1.24.0
-pillow>=9.0.0
 
 # Web Scraping and Data Processing
 selenium>=4.15.0
 webdriver-manager>=4.0.0
-pandas>=2.0.0
 openpyxl>=3.1.0
-beautifulsoup4>=4.12.0
 fake-useragent>=1.4.0
+
+# Video Processing (for downloads)
+opencv-python>=4.8.0
+numpy<2.0.0
+pillow>=9.0.0
