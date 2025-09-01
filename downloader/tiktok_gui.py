@@ -167,7 +167,7 @@ class TikTokDownloaderGUI:
         audio_check.grid(row=1, column=2, sticky=tk.W, pady=(10, 0))
         
         # Metadata checkbox
-        self.metadata_var = tk.BooleanVar(value=True)
+        self.metadata_var = tk.BooleanVar(value=False)
         metadata_check = ttk.Checkbutton(options_frame, text="Include Metadata", variable=self.metadata_var)
         metadata_check.grid(row=2, column=0, columnspan=3, sticky=tk.W, pady=(10, 0))
         
