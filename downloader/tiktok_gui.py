@@ -333,6 +333,22 @@ class TikTokDownloaderGUI:
             messagebox.showerror("Error", "Please enter valid TikTok URL(s)")
             return
         
+        # Check for duplicate URLs
+        unique_urls = []
+        duplicate_urls = []
+        for url in urls:
+            if url in unique_urls:
+                duplicate_urls.append(url)
+            else:
+                unique_urls.append(url)
+        
+        if duplicate_urls:
+            self.log_message(f"Removed {len(duplicate_urls)} duplicate URLs", "WARNING")
+        
+        if not unique_urls:
+            messagebox.showerror("Error", "No unique URLs to download")
+            return
+        
         # Update UI state
         self.download_btn.config(state=tk.DISABLED)
         self.stop_btn.config(state=tk.NORMAL)
@@ -340,7 +356,7 @@ class TikTokDownloaderGUI:
         self.status_var.set("Downloading...")
         
         # Start download thread
-        self.download_thread = threading.Thread(target=self.download_worker, args=(urls,))
+        self.download_thread = threading.Thread(target=self.download_worker, args=(unique_urls,))
         self.download_thread.daemon = True
         self.download_thread.start()
     

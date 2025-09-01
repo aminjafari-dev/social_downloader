@@ -391,7 +391,82 @@ class TikTokDownloader:
     
     def reset_video_counter(self):
         """Reset the video counter for new batch downloads."""
-        self.video_counter = 1
+        self.video_counter = self.find_next_video_number()
+    
+    def find_next_video_number(self) -> int:
+        """
+        Find the next available video number by checking Excel file and existing files.
+        
+        Returns:
+            int: Next available video number
+        """
+        if not self.custom_base_name:
+            return 1
+        
+        # Check if Excel file exists and has data
+        if self.excel_file.exists():
+            try:
+                # Load existing Excel file
+                from openpyxl import load_workbook
+                wb = load_workbook(str(self.excel_file))
+                ws = wb.active
+                
+                # Find the last row with data
+                last_row = ws.max_row
+                if last_row > 1:  # Skip header row
+                    # Check the last few rows for video numbers
+                    for row in range(last_row, 1, -1):
+                        download_path = ws.cell(row=row, column=len(self.headers)).value
+                        if download_path and self.custom_base_name in str(download_path):
+                            # Extract number from filename like "tiktok_video__1.mp4"
+                            import re
+                            match = re.search(rf'{re.escape(self.custom_base_name)}__(\d+)', str(download_path))
+                            if match:
+                                return int(match.group(1)) + 1
+            except Exception as e:
+                logger.warning(f"Could not read Excel file to find video number: {e}")
+        
+        # Check existing files in output directory
+        existing_files = list(self.output_dir.glob(f"{self.custom_base_name}__*.*"))
+        if existing_files:
+            max_number = 0
+            for file in existing_files:
+                import re
+                match = re.search(rf'{re.escape(self.custom_base_name)}__(\d+)', file.name)
+                if match:
+                    max_number = max(max_number, int(match.group(1)))
+            return max_number + 1
+        
+        return 1
+    
+    def is_url_already_downloaded(self, url: str) -> bool:
+        """
+        Check if a URL has already been downloaded by checking the Excel file.
+        
+        Args:
+            url (str): The URL to check
+            
+        Returns:
+            bool: True if URL already exists in Excel, False otherwise
+        """
+        if not self.excel_file.exists():
+            return False
+        
+        try:
+            # Load existing Excel file
+            from openpyxl import load_workbook
+            wb = load_workbook(str(self.excel_file))
+            ws = wb.active
+            
+            # Check if URL exists in the "Original URL" column (column 16)
+            for row in range(2, ws.max_row + 1):
+                existing_url = ws.cell(row=row, column=16).value
+                if existing_url == url:
+                    return True
+        except Exception as e:
+            logger.warning(f"Could not check Excel file for existing URL: {e}")
+        
+        return False
     
     def validate_url(self, url: str) -> bool:
         """
@@ -450,6 +525,12 @@ class TikTokDownloader:
             logger.error(f"Invalid TikTok URL: {url}")
             print(f"{Fore.RED}Error: Invalid TikTok URL provided{Style.RESET_ALL}")
             return False
+        
+        # Check if URL has already been downloaded
+        if self.is_url_already_downloaded(url):
+            logger.info(f"URL already downloaded: {url}")
+            print(f"{Fore.YELLOW}Warning: This video has already been downloaded{Style.RESET_ALL}")
+            return True
         
         try:
             print(f"{Fore.CYAN}Starting download for: {url}{Style.RESET_ALL}")
