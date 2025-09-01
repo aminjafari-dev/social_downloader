@@ -156,6 +156,32 @@ class DownloadManager:
         
         logger.info("Download manager settings updated")
     
+    def get_excel_status(self) -> dict:
+        """
+        Get information about the current Excel metadata file status.
+        
+        Returns:
+            dict: Dictionary containing Excel file information
+        """
+        try:
+            return self.excel_manager.get_excel_info()
+        except Exception as e:
+            logger.error(f"Error getting Excel status: {e}")
+            return {"error": f"Error getting Excel status: {str(e)}"}
+    
+    def get_excel_file_status_message(self) -> str:
+        """
+        Get a human-readable message about the Excel file status.
+        
+        Returns:
+            str: Status message
+        """
+        try:
+            return self.excel_manager.get_file_status()
+        except Exception as e:
+            logger.error(f"Error getting Excel file status: {e}")
+            return f"Error checking Excel file status: {str(e)}"
+    
     def validate_url(self, url: str) -> bool:
         """
         Validate if the provided URL is valid for the current platform.

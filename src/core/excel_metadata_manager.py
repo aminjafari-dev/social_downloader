@@ -56,15 +56,10 @@ class ExcelMetadataManager:
         
         # Set Excel file path
         if filename is None:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            self.excel_file = self.output_dir / f"videos_metadata_{timestamp}.xlsx"
+            # Use a consistent filename without timestamp to maintain data across sessions
+            self.excel_file = self.output_dir / "videos_metadata.xlsx"
         else:
             self.excel_file = self.output_dir / filename
-        
-        # Initialize Excel workbook
-        self.workbook = openpyxl.Workbook()
-        self.worksheet = self.workbook.active
-        self.worksheet.title = "Video Metadata"
         
         # Define headers for Excel
         self.headers = [
@@ -76,10 +71,51 @@ class ExcelMetadataManager:
             'Download Date', 'Download Path'
         ]
         
-        # Setup Excel headers
-        self._setup_excel_headers()
+        # Try to load existing Excel file, create new one if it doesn't exist
+        if self.excel_file.exists():
+            logger.info(f"Loading existing Excel file: {self.excel_file}")
+            self._load_existing_excel()
+        else:
+            logger.info(f"Creating new Excel file: {self.excel_file}")
+            self._create_new_excel()
         
         logger.info(f"ExcelMetadataManager initialized with file: {self.excel_file}")
+    
+    def _create_new_excel(self):
+        """Create a new Excel workbook with headers."""
+        self.workbook = openpyxl.Workbook()
+        self.worksheet = self.workbook.active
+        self.worksheet.title = "Video Metadata"
+        self._setup_excel_headers()
+        logger.info("Created new Excel workbook with headers")
+    
+    def _load_existing_excel(self):
+        """Load an existing Excel file and validate its structure."""
+        try:
+            self.workbook = openpyxl.load_workbook(str(self.excel_file))
+            self.worksheet = self.workbook.active
+            
+            # Validate that the file has the expected headers
+            if self.worksheet.max_row > 0:
+                existing_headers = []
+                for col in range(1, self.worksheet.max_column + 1):
+                    header_value = self.worksheet.cell(row=1, column=col).value
+                    existing_headers.append(header_value)
+                
+                # Check if headers match our expected format
+                if len(existing_headers) >= len(self.headers):
+                    logger.info(f"Loaded existing Excel file with {self.worksheet.max_row - 1} data rows")
+                else:
+                    logger.warning("Existing Excel file has different structure, creating new one")
+                    self._create_new_excel()
+            else:
+                logger.info("Existing Excel file is empty, setting up headers")
+                self._setup_excel_headers()
+                
+        except Exception as e:
+            logger.error(f"Error loading existing Excel file: {e}")
+            logger.info("Creating new Excel file due to loading error")
+            self._create_new_excel()
     
     def _setup_excel_headers(self):
         """Setup Excel worksheet with headers and formatting."""
@@ -222,6 +258,14 @@ class ExcelMetadataManager:
             download_path (str): Path where video was downloaded
         """
         try:
+            # Check if video already exists in Excel to avoid duplicates
+            video_id = info.get('id', '')
+            original_url = info.get('webpage_url', '')
+            
+            if self._video_exists(video_id, original_url):
+                logger.info(f"Video already exists in Excel, skipping: {info.get('title', 'Unknown')}")
+                return
+            
             # Get next row number
             next_row = self.worksheet.max_row + 1
             
@@ -252,6 +296,46 @@ class ExcelMetadataManager:
         except Exception as e:
             logger.error(f"Error adding metadata to Excel: {e}")
     
+    def _video_exists(self, video_id: str, original_url: str) -> bool:
+        """
+        Check if a video already exists in the Excel file.
+        
+        Args:
+            video_id (str): Video ID to check
+            original_url (str): Original URL to check
+            
+        Returns:
+            bool: True if video exists, False otherwise
+        """
+        if not video_id and not original_url:
+            return False
+        
+        # Find the column indices for Video ID and Original URL
+        video_id_col = None
+        url_col = None
+        
+        for col in range(1, self.worksheet.max_column + 1):
+            header_value = self.worksheet.cell(row=1, column=col).value
+            if header_value == 'Video ID':
+                video_id_col = col
+            elif header_value == 'Original URL':
+                url_col = col
+        
+        # Check existing rows for duplicates
+        for row in range(2, self.worksheet.max_row + 1):
+            existing_video_id = self.worksheet.cell(row=row, column=video_id_col).value if video_id_col else None
+            existing_url = self.worksheet.cell(row=row, column=url_col).value if url_col else None
+            
+            # Check if video ID matches
+            if video_id and existing_video_id and str(video_id) == str(existing_video_id):
+                return True
+            
+            # Check if URL matches
+            if original_url and existing_url and str(original_url) == str(existing_url):
+                return True
+        
+        return False
+    
     def save_excel_file(self):
         """Save the Excel file with all collected metadata."""
         try:
@@ -277,12 +361,24 @@ class ExcelMetadataManager:
                 logger.warning(f"Excel file does not exist: {file_path}")
                 return False
             
+            # Update the Excel file path
+            self.excel_file = Path(file_path)
+            
             # Load existing workbook
             self.workbook = openpyxl.load_workbook(file_path)
             self.worksheet = self.workbook.active
-            self.excel_file = Path(file_path)
             
-            logger.info(f"Loaded existing Excel file: {file_path}")
+            # Validate the structure
+            if self.worksheet.max_row > 0:
+                existing_headers = []
+                for col in range(1, self.worksheet.max_column + 1):
+                    header_value = self.worksheet.cell(row=1, column=col).value
+                    existing_headers.append(header_value)
+                
+                logger.info(f"Loaded existing Excel file: {file_path} with {self.worksheet.max_row - 1} data rows")
+            else:
+                logger.info(f"Loaded existing Excel file: {file_path} (empty)")
+            
             return True
             
         except Exception as e:
@@ -368,7 +464,9 @@ class ExcelMetadataManager:
                 "total_rows": self.worksheet.max_row,
                 "total_columns": self.worksheet.max_column,
                 "data_rows": max(0, self.worksheet.max_row - 1),  # Exclude header row
-                "column_names": self.headers
+                "column_names": self.headers,
+                "file_exists": self.excel_file.exists(),
+                "is_new_file": not self.excel_file.exists() or self.worksheet.max_row <= 1
             }
             
             return info
@@ -396,3 +494,23 @@ class ExcelMetadataManager:
             logger.info("Excel workbook closed")
         except Exception as e:
             logger.error(f"Error closing workbook: {e}")
+    
+    def get_file_status(self) -> str:
+        """
+        Get a human-readable status of the Excel file.
+        
+        Returns:
+            str: Status message describing the current state
+        """
+        try:
+            if not self.excel_file.exists():
+                return "New file will be created"
+            
+            data_rows = max(0, self.worksheet.max_row - 1)
+            if data_rows == 0:
+                return "Empty file - ready for new data"
+            else:
+                return f"Existing file with {data_rows} videos - will append new data"
+                
+        except Exception as e:
+            return f"Error checking file status: {str(e)}"

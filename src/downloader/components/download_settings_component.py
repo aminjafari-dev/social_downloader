@@ -41,14 +41,16 @@ class DownloadSettingsComponent:
         frame (ttk.LabelFrame): Main frame containing all settings widgets
     """
     
-    def __init__(self, parent: tk.Widget):
+    def __init__(self, parent: tk.Widget, on_settings_changed=None):
         """
         Initialize the DownloadSettingsComponent.
         
         Args:
             parent (tk.Widget): Parent widget to contain this component
+            on_settings_changed (callable, optional): Callback function when settings change
         """
         self.parent = parent
+        self.on_settings_changed = on_settings_changed
         
         # Initialize variables with default values
         self.output_dir_var = tk.StringVar(value="downloads")
@@ -62,6 +64,30 @@ class DownloadSettingsComponent:
         
         self._create_widgets()
         self._setup_layout()
+        
+        # Bind variables to trigger settings change callback
+        self._bind_settings_callbacks()
+    
+    def _bind_settings_callbacks(self):
+        """Bind variable changes to trigger settings change callback."""
+        if self.on_settings_changed:
+            self.output_dir_var.trace_add("write", self._on_setting_changed)
+            self.custom_name_var.trace_add("write", self._on_setting_changed)
+            self.quality_var.trace_add("write", self._on_setting_changed)
+            self.audio_only_var.trace_add("write", self._on_setting_changed)
+            self.metadata_var.trace_add("write", self._on_setting_changed)
+            self.excel_export_var.trace_add("write", self._on_setting_changed)
+    
+    def _on_setting_changed(self, *args):
+        """Callback when any setting changes."""
+        if self.on_settings_changed:
+            try:
+                self.on_settings_changed()
+            except Exception as e:
+                # Log error but don't crash the application
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Error in settings change callback: {e}")
     
     def _create_widgets(self):
         """Create all widgets for the download settings component."""

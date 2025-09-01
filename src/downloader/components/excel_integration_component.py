@@ -95,6 +95,10 @@ class ExcelIntegrationComponent:
         # Excel status
         ttk.Label(self.frame, textvariable=self.excel_status_var, foreground="blue").grid(row=3, column=0, columnspan=3, pady=(5, 0))
         
+        # Excel file status (shows if file exists and will append)
+        self.excel_file_status_var = tk.StringVar(value="")
+        ttk.Label(self.frame, textvariable=self.excel_file_status_var, foreground="green", font=("TkDefaultFont", 8)).grid(row=4, column=0, columnspan=3, pady=(2, 0))
+        
         # Configure grid weights for proper expansion
         self.frame.columnconfigure(1, weight=1)
     
@@ -299,10 +303,19 @@ class ExcelIntegrationComponent:
         self.excel_status_var.set(message)
         if is_error:
             # Change color to red for errors
-            self.frame.winfo_children()[-1].configure(foreground="red")
+            self.frame.winfo_children()[-2].configure(foreground="red")  # -2 because we added a new label
         else:
             # Reset to blue for normal messages
-            self.frame.winfo_children()[-1].configure(foreground="blue")
+            self.frame.winfo_children()[-2].configure(foreground="blue")  # -2 because we added a new label
+    
+    def set_excel_file_status(self, message: str):
+        """
+        Set the Excel file status message.
+        
+        Args:
+            message (str): File status message to display
+        """
+        self.excel_file_status_var.set(message)
     
     def update_download_progress(self, current: int, total: int, video_title: str = ""):
         """

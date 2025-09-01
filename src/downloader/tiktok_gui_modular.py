@@ -131,6 +131,9 @@ class TikTokDownloaderModularGUI:
         # Start message processing
         self.root.after(100, self._process_messages)
         
+        # Update Excel file status display
+        self._update_excel_file_status()
+        
         logger.info("TikTok Downloader Modular GUI initialized")
     
     def _create_widgets(self):
@@ -190,7 +193,10 @@ class TikTokDownloaderModularGUI:
         )
         
         # Download settings component
-        self.components['download_settings'] = DownloadSettingsComponent(self.main_frame)
+        self.components['download_settings'] = DownloadSettingsComponent(
+            self.main_frame,
+            on_settings_changed=self._on_settings_changed
+        )
         self.components['download_settings'].get_widget().grid(
             row=3, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10)
         )
@@ -246,6 +252,29 @@ class TikTokDownloaderModularGUI:
     def _on_process_existing_downloads(self):
         """Callback when processing existing downloads."""
         self._process_existing_downloads()
+    
+    def _update_excel_file_status(self):
+        """Update the Excel file status display."""
+        try:
+            status_message = self.download_manager.get_excel_file_status_message()
+            self.components['excel_integration'].set_excel_file_status(status_message)
+        except Exception as e:
+            logger.error(f"Error updating Excel file status: {e}")
+            self.components['excel_integration'].set_excel_file_status("Error checking file status")
+    
+    def _on_settings_changed(self):
+        """Callback when download settings change."""
+        try:
+            # Update download manager settings
+            settings = self.components['download_settings'].get_settings()
+            self.download_manager.update_settings(**settings)
+            
+            # Update Excel file status display
+            self._update_excel_file_status()
+            
+            logger.info("Download settings updated and Excel status refreshed")
+        except Exception as e:
+            logger.error(f"Error updating settings: {e}")
     
     def _process_messages(self):
         """Process messages from all components."""
