@@ -137,12 +137,12 @@ class TikTokDownloaderModularGUI:
         logger.info("TikTok Downloader Modular GUI initialized")
     
     def _create_widgets(self):
-        """Create all GUI widgets and components."""
-        # Main frame
-        self.main_frame = ttk.Frame(self.root, padding="10")
+        """Create all GUI widgets and components with scrollable functionality."""
+        # Create main scrollable frame
+        self._create_scrollable_frame()
         
         # Title and control buttons
-        title_frame = ttk.Frame(self.main_frame)
+        title_frame = ttk.Frame(self.content_frame)
         title_frame.grid(row=0, column=0, columnspan=2, pady=(0, 20), sticky=(tk.W, tk.E))
         
         title_label = ttk.Label(
@@ -174,27 +174,232 @@ class TikTokDownloaderModularGUI:
         # Create components
         self._create_components()
         
-        # Configure grid weights
-        self.main_frame.columnconfigure(0, weight=1)
-        self.main_frame.rowconfigure(5, weight=1)  # Log component row
+        # Configure grid weights for content frame
+        self.content_frame.columnconfigure(0, weight=1)
+        self.content_frame.rowconfigure(5, weight=1)  # Log component row
+    
+    def _create_scrollable_frame(self):
+        """
+        Create a scrollable frame that contains all the GUI content.
+        
+        This method creates a canvas with scrollbars that allows users to scroll
+        through all the content when the window is resized to be small.
+        """
+        # Create main container frame
+        self.main_container = ttk.Frame(self.root)
+        self.main_container.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        
+        # Create canvas for scrolling
+        self.canvas = tk.Canvas(self.main_container, bg='white')
+        
+        # Create scrollbars
+        self.v_scrollbar = ttk.Scrollbar(self.main_container, orient="vertical", command=self.canvas.yview)
+        self.h_scrollbar = ttk.Scrollbar(self.main_container, orient="horizontal", command=self.canvas.xview)
+        
+        # Create the content frame that will be placed inside the canvas
+        self.content_frame = ttk.Frame(self.canvas, padding="10")
+        
+        # Configure canvas scrolling
+        self.canvas.configure(
+            yscrollcommand=self.v_scrollbar.set,
+            xscrollcommand=self.h_scrollbar.set
+        )
+        
+        # Create a window inside the canvas to hold the content frame
+        self.canvas_window = self.canvas.create_window((0, 0), window=self.content_frame, anchor="nw")
+        
+        # Configure grid layout for the main container
+        self.main_container.grid_rowconfigure(0, weight=1)
+        self.main_container.grid_columnconfigure(0, weight=1)
+        
+        # Place canvas and scrollbars
+        self.canvas.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        self.v_scrollbar.grid(row=0, column=1, sticky=(tk.N, tk.S))
+        self.h_scrollbar.grid(row=1, column=0, sticky=(tk.W, tk.E))
+        
+        # Bind events for dynamic scrolling
+        self._bind_scroll_events()
+        
+        # Configure root window grid weights
+        self.root.grid_rowconfigure(0, weight=1)
+        self.root.grid_columnconfigure(0, weight=1)
+    
+    def _bind_scroll_events(self):
+        """
+        Bind events to handle dynamic scrolling and canvas resizing.
+        
+        This method sets up event handlers to:
+        - Update scroll region when content changes
+        - Handle mouse wheel scrolling
+        - Resize canvas window when main window is resized
+        """
+        # Bind mouse wheel scrolling with better cross-platform support
+        self.canvas.bind("<MouseWheel>", self._on_mousewheel)
+        self.canvas.bind("<Button-4>", self._on_mousewheel)
+        self.canvas.bind("<Button-5>", self._on_mousewheel)
+        
+        # Bind to the content frame as well for better coverage
+        self.content_frame.bind("<MouseWheel>", self._on_mousewheel)
+        self.content_frame.bind("<Button-4>", self._on_mousewheel)
+        self.content_frame.bind("<Button-5>", self._on_mousewheel)
+        
+        # Bind window resize events
+        self.content_frame.bind("<Configure>", self._on_frame_configure)
+        self.canvas.bind("<Configure>", self._on_canvas_configure)
+        
+        # Bind mouse wheel to scrollbars for better cross-platform support
+        self.v_scrollbar.bind("<MouseWheel>", self._on_mousewheel)
+        self.h_scrollbar.bind("<MouseWheel>", self._on_mousewheel)
+        
+        # Bind to the main container for comprehensive coverage
+        self.main_container.bind("<MouseWheel>", self._on_mousewheel)
+        self.main_container.bind("<Button-4>", self._on_mousewheel)
+        self.main_container.bind("<Button-5>", self._on_mousewheel)
+        
+        # Bind keyboard shortcuts for scrolling
+        self.root.bind("<Up>", self._on_key_scroll_up)
+        self.root.bind("<Down>", self._on_key_scroll_down)
+        self.root.bind("<Page_Up>", self._on_key_scroll_page_up)
+        self.root.bind("<Page_Down>", self._on_key_scroll_page_down)
+        self.root.bind("<Home>", self._on_key_scroll_home)
+        self.root.bind("<End>", self._on_key_scroll_end)
+        
+        # Bind to all child widgets for comprehensive mouse wheel support
+        self._bind_mousewheel_to_children(self.root)
+    
+    def _bind_mousewheel_to_children(self, widget):
+        """
+        Recursively bind mouse wheel events to all child widgets.
+        
+        Args:
+            widget: The widget to bind events to and search for children
+        """
+        try:
+            # Bind to current widget
+            widget.bind("<MouseWheel>", self._on_mousewheel)
+            widget.bind("<Button-4>", self._on_mousewheel)
+            widget.bind("<Button-5>", self._on_mousewheel)
+            
+            # Recursively bind to all children
+            for child in widget.winfo_children():
+                self._bind_mousewheel_to_children(child)
+        except:
+            pass  # Ignore binding errors
+    
+    def _on_key_scroll_up(self, event):
+        """Handle Up arrow key for scrolling up."""
+        self.canvas.yview_scroll(-1, "units")
+        return "break"  # Prevent default behavior
+    
+    def _on_key_scroll_down(self, event):
+        """Handle Down arrow key for scrolling down."""
+        self.canvas.yview_scroll(1, "units")
+        return "break"  # Prevent default behavior
+    
+    def _on_key_scroll_page_up(self, event):
+        """Handle Page Up key for scrolling up one page."""
+        self.canvas.yview_scroll(-1, "pages")
+        return "break"  # Prevent default behavior
+    
+    def _on_key_scroll_page_down(self, event):
+        """Handle Page Down key for scrolling down one page."""
+        self.canvas.yview_scroll(1, "pages")
+        return "break"  # Prevent default behavior
+    
+    def _on_key_scroll_home(self, event):
+        """Handle Home key for scrolling to top."""
+        self.canvas.yview_moveto(0)
+        return "break"  # Prevent default behavior
+    
+    def _on_key_scroll_end(self, event):
+        """Handle End key for scrolling to bottom."""
+        self.canvas.yview_moveto(1)
+        return "break"  # Prevent default behavior
+    
+    def _on_mousewheel(self, event):
+        """
+        Handle mouse wheel scrolling events with improved cross-platform support.
+        
+        Args:
+            event: The mouse wheel event
+        """
+        try:
+            # Handle different mouse wheel events across platforms
+            if hasattr(event, 'num'):
+                # Linux scroll events
+                if event.num == 4:  # Linux scroll up
+                    self.canvas.yview_scroll(-1, "units")
+                elif event.num == 5:  # Linux scroll down
+                    self.canvas.yview_scroll(1, "units")
+            elif hasattr(event, 'delta'):
+                # Windows/Mac scroll events
+                if event.delta != 0:
+                    # Normalize the delta value for consistent scrolling
+                    scroll_amount = int(-1 * (event.delta / 120))
+                    self.canvas.yview_scroll(scroll_amount, "units")
+            else:
+                # Fallback for other platforms or event types
+                # Try to determine scroll direction from event state
+                if hasattr(event, 'state'):
+                    # Check if shift is pressed for horizontal scrolling
+                    if event.state & 1:  # Shift key
+                        if event.delta > 0:
+                            self.canvas.xview_scroll(-1, "units")
+                        else:
+                            self.canvas.xview_scroll(1, "units")
+                    else:
+                        if event.delta > 0:
+                            self.canvas.yview_scroll(-1, "units")
+                        else:
+                            self.canvas.yview_scroll(1, "units")
+                else:
+                    # Default vertical scrolling
+                    self.canvas.yview_scroll(-1, "units")
+                    
+        except Exception as e:
+            # Fallback scrolling if event handling fails
+            try:
+                self.canvas.yview_scroll(-1, "units")
+            except:
+                pass  # Silently fail if scrolling is not possible
+    
+    def _on_frame_configure(self, event=None):
+        """
+        Update the scroll region when the content frame is configured.
+        
+        Args:
+            event: The configure event (optional)
+        """
+        # Update the scroll region to encompass the inner frame
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+    
+    def _on_canvas_configure(self, event):
+        """
+        Resize the canvas window when the canvas is resized.
+        
+        Args:
+            event: The configure event
+        """
+        # Update the width of the canvas window to match the canvas width
+        self.canvas.itemconfig(self.canvas_window, width=event.width)
     
     def _create_components(self):
         """Create all GUI components."""
         # Video URL component
-        self.components['video_url'] = VideoURLComponent(self.main_frame)
+        self.components['video_url'] = VideoURLComponent(self.content_frame)
         self.components['video_url'].get_widget().grid(
             row=1, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10)
         )
         
         # Batch mode component
-        self.components['batch_mode'] = BatchModeComponent(self.main_frame)
+        self.components['batch_mode'] = BatchModeComponent(self.content_frame)
         self.components['batch_mode'].get_widget().grid(
             row=2, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10)
         )
         
         # Download settings component
         self.components['download_settings'] = DownloadSettingsComponent(
-            self.main_frame,
+            self.content_frame,
             on_settings_changed=self._on_settings_changed
         )
         self.components['download_settings'].get_widget().grid(
@@ -203,7 +408,7 @@ class TikTokDownloaderModularGUI:
         
         # Excel integration component
         self.components['excel_integration'] = ExcelIntegrationComponent(
-            self.main_frame, 
+            self.content_frame, 
             self.excel_loader,
             on_url_validation=self.download_manager.validate_url
         )
@@ -212,7 +417,7 @@ class TikTokDownloaderModularGUI:
         )
         
         # Log component
-        self.components['log'] = LogComponent(self.main_frame)
+        self.components['log'] = LogComponent(self.content_frame)
         self.components['log'].get_widget().grid(
             row=5, column=0, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(10, 0)
         )
@@ -231,11 +436,9 @@ class TikTokDownloaderModularGUI:
     
     def _setup_layout(self):
         """Setup the main layout and grid weights."""
-        self.main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
-        
-        # Configure grid weights
-        self.root.columnconfigure(0, weight=1)
-        self.root.rowconfigure(0, weight=1)
+        # The layout is now handled in _create_scrollable_frame()
+        # Grid weights are configured there for proper scrolling behavior
+        pass
     
     def _on_excel_columns_loaded(self, columns: List[str]):
         """Callback when Excel columns are loaded."""
