@@ -20,3 +20,7 @@
 2025-08-30 00:30:36,829 - ERROR - Download error: [0;31mERROR:[0m [TikTok] 7485217206184316182: Unable to download webpage: <urllib3.connection.HTTPSConnection object at 0x1161b77d0>: Failed to establish a new connection: [Errno 61] Connection refused (caused by TransportError('<urllib3.connection.HTTPSConnection object at 0x1161b77d0>: Failed to establish a new connection: [Errno 61] Connection refused'))
 2025-08-30 00:30:36,830 - INFO - Starting download for URL: https://www.tiktok.com/@kidfunai/video/7539480497630563598
 2025-08-30 00:30:37,078 - ERROR - Download error: [0;31mERROR:[0m [TikTok] 7539480497630563598: Unable to download webpage: <urllib3.connection.HTTPSConnection object at 0x127325400>: Failed to establish a new connection: [Errno 61] Connection refused (caused by TransportError('<urllib3.connection.HTTPSConnection object at 0x127325400>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-08-31 00:44:08,682 - INFO - Added metadata to Excel: | Funny Baby Moment | 😂😂😂#funny #meme #fyp #top #baby 
+2025-08-31 00:44:08,685 - INFO - Added metadata to Excel: The Cutest Reactions 🥺❤️ #baby #babiesoftiktok #babyfever #funnybaby ...
+2025-08-31 00:44:08,687 - INFO - Added metadata to Excel: 😭😭😭 funniest baby moments that will make your day 🤣👶 #trytowatchwitho...
+2025-08-31 00:44:08,703 - INFO - Excel file saved: downloads/tiktok_videos_metadata_20250831_004408.xlsx
