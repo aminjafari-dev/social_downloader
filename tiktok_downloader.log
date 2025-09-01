@@ -332,3 +332,61 @@
 2025-09-01 17:30:26,866 - INFO - Download completed successfully
 2025-09-01 17:30:26,866 - INFO - Video counter after download: 2
 2025-09-01 17:30:26,877 - INFO - Excel file saved: downloads/tiktok_video__excel.xlsx
+2025-09-01 17:42:21,627 - INFO - Successfully loaded 5 columns from Excel file
+2025-09-01 17:42:38,048 - INFO - Successfully loaded 5 columns from Excel file
+2025-09-01 17:42:38,048 - INFO - Found column 'URL' at index 1
+2025-09-01 17:42:38,054 - INFO - Successfully extracted 3 values from column 'URL'
+2025-09-01 17:42:38,054 - INFO - Extracted 3 valid URLs from column 'URL'
+2025-09-01 17:42:38,067 - INFO - Checking Excel file for URL: https://www.tiktok.com/@tonsrankings/video/7525496313627053367
+2025-09-01 17:42:38,067 - INFO - Excel file has 4 rows
+2025-09-01 17:42:38,067 - INFO - Row 2: existing URL = https://www.tiktok.com/@tonsrankings/video/7525496313627053367
+2025-09-01 17:42:38,067 - INFO - URL already exists in Excel: https://www.tiktok.com/@tonsrankings/video/7525496313627053367
+2025-09-01 17:42:38,074 - INFO - Checking Excel file for URL: https://www.tiktok.com/@bababoii.clip/video/7511008272837528875
+2025-09-01 17:42:38,074 - INFO - Excel file has 4 rows
+2025-09-01 17:42:38,074 - INFO - Row 2: existing URL = https://www.tiktok.com/@tonsrankings/video/7525496313627053367
+2025-09-01 17:42:38,074 - INFO - Row 3: existing URL = https://www.tiktok.com/@bababoii.clip/video/7511008272837528875
+2025-09-01 17:42:38,074 - INFO - URL already exists in Excel: https://www.tiktok.com/@bababoii.clip/video/7511008272837528875
+2025-09-01 17:42:38,082 - INFO - Checking Excel file for URL: https://www.tiktok.com/@top5cliip/video/7538927532142365974
+2025-09-01 17:42:38,082 - INFO - Excel file has 4 rows
+2025-09-01 17:42:38,082 - INFO - Row 2: existing URL = https://www.tiktok.com/@tonsrankings/video/7525496313627053367
+2025-09-01 17:42:38,082 - INFO - Row 3: existing URL = https://www.tiktok.com/@bababoii.clip/video/7511008272837528875
+2025-09-01 17:42:38,083 - INFO - Row 4: existing URL = https://www.tiktok.com/@top5cliip/video/7538927532142365974
+2025-09-01 17:42:38,083 - INFO - URL already exists in Excel: https://www.tiktok.com/@top5cliip/video/7538927532142365974
+2025-09-01 17:42:38,092 - INFO - Excel file saved: downloads/tiktok_video__excel.xlsx
+2025-09-01 17:42:51,336 - INFO - Successfully loaded 5 columns from Excel file
+2025-09-01 17:42:51,336 - INFO - Found column 'URL' at index 1
+2025-09-01 17:42:51,345 - INFO - Successfully extracted 3 values from column 'URL'
+2025-09-01 17:42:51,345 - INFO - Extracted 3 valid URLs from column 'URL'
+2025-09-01 17:42:51,404 - INFO - Next video number will be: 1
+2025-09-01 17:42:51,413 - INFO - Excel file doesn't exist yet, URL not downloaded: https://www.tiktok.com/@tonsrankings/video/7525496313627053367
+2025-09-01 17:42:51,414 - INFO - Starting download for URL: https://www.tiktok.com/@tonsrankings/video/7525496313627053367
+2025-09-01 17:42:51,414 - INFO - Current video counter: 3
+2025-09-01 17:44:28,303 - INFO - Successfully loaded 5 columns from Excel file
+2025-09-01 17:44:30,178 - INFO - Successfully loaded 5 columns from Excel file
+2025-09-01 17:44:30,178 - INFO - Found column 'URL' at index 1
+2025-09-01 17:44:30,183 - INFO - Successfully extracted 3 values from column 'URL'
+2025-09-01 17:44:30,183 - INFO - Extracted 3 valid URLs from column 'URL'
+2025-09-01 17:44:30,192 - INFO - Starting download for URL: https://www.tiktok.com/@tonsrankings/video/7525496313627053367
+2025-09-01 18:17:04,829 - INFO - VideoDownloader initialized with output_dir: downloads, quality: best
+2025-09-01 18:17:04,829 - INFO - VideoDownloader initialized with output_dir: downloads, quality: best
+2025-09-01 18:17:04,829 - INFO - TikTokDownloader initialized with TikTok-specific functionality
+2025-09-01 18:17:04,834 - INFO - ExcelMetadataManager initialized with file: downloads/videos_metadata_20250901_181704.xlsx
+2025-09-01 18:17:04,834 - INFO - URLProcessor initialized with support for multiple platforms
+2025-09-01 18:17:04,834 - INFO - DownloadManager initialized for tiktok platform
+2025-09-01 18:17:04,835 - INFO - TikTokDownloader initialized with output_dir: downloads, quality: best
+2025-09-01 18:17:04,835 - INFO - VideoDownloader initialized with output_dir: downloads, quality: best
+2025-09-01 18:17:04,835 - INFO - VideoDownloader initialized with output_dir: downloads, quality: best
+2025-09-01 18:17:04,835 - INFO - TikTokDownloader initialized with TikTok-specific functionality
+2025-09-01 18:17:04,840 - INFO - ExcelMetadataManager initialized with file: downloads/videos_metadata_20250901_181704.xlsx
+2025-09-01 18:17:04,841 - INFO - URLProcessor initialized with support for multiple platforms
+2025-09-01 18:17:04,841 - INFO - DownloadManager initialized for tiktok platform
+2025-09-01 18:17:04,842 - INFO - Processed batch text: found 1 unique URLs
+2025-09-01 18:17:04,842 - INFO - URL validation completed: 1 valid, 0 invalid
+2025-09-01 18:17:04,842 - INFO - Processed batch text: found 2 unique URLs
+2025-09-01 18:17:04,842 - INFO - URL validation completed: 2 valid, 0 invalid
+2025-09-01 18:17:04,843 - INFO - VideoDownloader initialized with output_dir: downloads, quality: best
+2025-09-01 18:17:04,847 - INFO - VideoDownloader initialized with output_dir: downloads, quality: best
+2025-09-01 18:17:04,847 - INFO - TikTokDownloader initialized with TikTok-specific functionality
+2025-09-01 18:17:04,986 - INFO - ExcelMetadataManager initialized with file: downloads/videos_metadata_20250901_181704.xlsx
+2025-09-01 18:17:04,986 - INFO - URLProcessor initialized with support for multiple platforms
+2025-09-01 18:17:04,986 - INFO - DownloadManager initialized for tiktok platform
