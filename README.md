@@ -1,280 +1,139 @@
-# TikTok Video Downloader
+# Social Downloader - User Guide
 
-A powerful Python application for downloading TikTok videos from URLs with metadata extraction and quality selection.
+## 🎯 What is this application?
 
-## Features
+Social Downloader is a user-friendly application that helps you download videos from TikTok and other social media platforms. It features a simple graphical interface that makes downloading videos easy, even if you have no programming experience.
 
-- **Single Video Download**: Download individual TikTok videos with quality selection
-- **Batch Download**: Download multiple videos from a list of URLs
-- **Quality Selection**: Choose video quality (best, 720p, 480p, etc.)
-- **Metadata Extraction**: Extract video information and save metadata
-- **GUI Interface**: User-friendly graphical interface for downloads
-- **Progress Tracking**: Real-time download progress and status
-- **Error Handling**: Comprehensive error handling and retry logic
-- **Organized Output**: Automatic file organization and naming
+## ✨ Features
 
-## Installation
+- **Easy-to-use GUI**: Simple interface with buttons and forms
+- **Batch Downloads**: Download multiple videos at once
+- **Excel Integration**: Import video URLs from Excel files
+- **Custom Naming**: Choose how your downloaded files are named
+- **Download Progress**: See real-time progress of your downloads
+- **Error Handling**: Clear messages when something goes wrong
 
-1. Clone or download this repository
-2. Install required dependencies:
+## 🚀 Quick Start Guide
 
-```bash
-pip install -r requirements.txt
-```
+### Step 1: Download and Extract
+1. Download the application folder to your computer
+2. Extract (unzip) the folder to a location you can easily find (like Desktop)
 
-## Quick Start
+### Step 2: Run the Setup Script
+1. **Windows Users**: Double-click on `setup_windows.bat`
+2. **Mac Users**: Double-click on `setup_mac.sh`
+3. **Linux Users**: Double-click on `setup_linux.sh`
 
-### Download a Single Video
-```bash
-python main.py download --url "https://tiktok.com/@user/video/123456789"
-```
+The setup script will automatically:
+- Install Python (if not already installed)
+- Install all required packages
+- Set up the application for first use
 
-### Download with Custom Quality
-```bash
-python main.py download --url "https://tiktok.com/@user/video/123456789" --quality 720p
-```
+### Step 3: Launch the Application
+1. **Windows Users**: Double-click on `start_windows.bat`
+2. **Mac Users**: Double-click on `start_mac.sh`
+3. **Linux Users**: Double-click on `start_linux.sh`
 
-### Batch Download from File
-```bash
-python main.py download-batch --file urls.txt --output-dir downloads
-```
+## 📋 System Requirements
 
-### Using the GUI
-```bash
-python downloader/tiktok_gui.py
-```
+- **Operating System**: Windows 10/11, macOS 10.14+, or Linux
+- **Internet Connection**: Required for downloading videos
+- **Storage Space**: At least 500MB free space
+- **Memory**: 4GB RAM recommended
 
-## Usage Examples
+## 🛠️ Manual Setup (If Auto-Setup Doesn't Work)
 
-### Example 1: Single Video Download
-```python
-from downloader.tiktok_downloader import TikTokDownloader
+### Windows Manual Setup
+1. Download Python from [python.org](https://www.python.org/downloads/)
+2. During installation, make sure to check "Add Python to PATH"
+3. Open Command Prompt (cmd) in the application folder
+4. Type: `pip install -r requirements.txt`
+5. Type: `python src/run.py`
 
-# Initialize downloader
-downloader = TikTokDownloader(output_dir="downloads", quality="best")
+### Mac Manual Setup
+1. Install Python using Homebrew: `brew install python`
+2. Open Terminal in the application folder
+3. Type: `pip3 install -r requirements.txt`
+4. Type: `python3 src/run.py`
 
-# Download a video
-success = downloader.download_video("https://tiktok.com/@user/video/123456789")
+### Linux Manual Setup
+1. Install Python: `sudo apt-get install python3 python3-pip`
+2. Open Terminal in the application folder
+3. Type: `pip3 install -r requirements.txt`
+4. Type: `python3 src/run.py`
 
-if success:
-    print("Video downloaded successfully!")
-```
+## 🎮 How to Use the Application
 
-### Example 2: Batch Download
-```python
-from downloader.tiktok_downloader import TikTokDownloader
+### Basic Usage
+1. **Launch the app** using the start script
+2. **Enter a video URL** in the text field
+3. **Click "Download"** to start downloading
+4. **Find your video** in the `downloads` folder
 
-# Initialize downloader
-downloader = TikTokDownloader(output_dir="downloads", quality="720p")
+### Advanced Features
+- **Batch Mode**: Add multiple URLs separated by commas
+- **Excel Import**: Use the Excel integration to download from a spreadsheet
+- **Custom Settings**: Adjust download quality and file naming
+- **Progress Tracking**: Monitor download progress in real-time
 
-# List of URLs to download
-urls = [
-    "https://tiktok.com/@user1/video/123456789",
-    "https://tiktok.com/@user2/video/987654321",
-    "https://tiktok.com/@user3/video/456789123"
-]
-
-# Download multiple videos
-results = downloader.download_multiple_videos(urls)
-
-# Check results
-successful = sum(results.values())
-print(f"Successfully downloaded {successful}/{len(urls)} videos")
-```
-
-### Example 3: GUI Usage
-```python
-from downloader.tiktok_gui import TikTokDownloaderGUI
-
-# Launch GUI
-app = TikTokDownloaderGUI()
-app.run()
-```
-
-## Command Line Interface
-
-### Download Command
-```bash
-python main.py download [OPTIONS]
-
-Options:
-  --url, -u TEXT        TikTok video URL [required]
-  --output-dir TEXT     Output directory [default: downloads]
-  --quality TEXT        Video quality (best, 720p, 480p, etc.) [default: best]
-```
-
-### Batch Download Command
-```bash
-python main.py download-batch [OPTIONS]
-
-Options:
-  --file, -f TEXT       File containing TikTok URLs (one per line) [required]
-  --output-dir TEXT     Output directory [default: downloads]
-  --quality TEXT        Video quality (best, 720p, 480p, etc.) [default: best]
-```
-
-## Project Structure
+## 📁 File Structure
 
 ```
 social_downloader/
-├── main.py                     # Main application entry point
-├── requirements.txt            # Python dependencies
-├── README.md                   # This file
-├── QUICK_START_GUIDE.md        # Quick start guide
-├── downloader/                 # Core download functionality
-│   ├── __init__.py
-│   ├── tiktok_downloader.py    # Core TikTok downloader
-│   └── tiktok_gui.py           # GUI interface
-├── core/                       # Shared utilities
-│   ├── __init__.py
-│   └── example.py              # Example usage
-├── gui/                        # GUI utilities
-│   └── __init__.py
-├── tests/                      # Test files
-│   ├── __init__.py
-│   └── test_installation.py    # Installation tests
-├── docs/                       # Documentation
-├── downloads/                  # Downloaded content
-│   ├── original/               # Original downloaded videos
-│   ├── processed/              # Processed videos (if any)
-│   └── metadata/               # Video metadata
-└── models/                     # Data models
+├── downloads/              # Downloaded videos go here
+├── src/                    # Application source code
+├── requirements.txt        # Required packages
+├── setup_windows.bat      # Windows setup script
+├── setup_mac.sh           # Mac setup script
+├── setup_linux.sh         # Linux setup script
+├── start_windows.bat      # Windows start script
+├── start_mac.sh           # Mac start script
+├── start_linux.sh         # Linux start script
+└── README.md              # This file
 ```
 
-## Download Features
+## 🔧 Troubleshooting
 
-### Quality Options
-- **best**: Highest available quality
-- **720p**: 720p resolution
-- **480p**: 480p resolution
-- **360p**: 360p resolution
-- **auto**: Automatic quality selection
+### Common Issues and Solutions
 
-### Output Organization
-- **Original Videos**: Downloaded videos in original format
-- **Metadata**: JSON files with video information
-- **Descriptions**: Text files with video descriptions
-- **Thumbnails**: Video thumbnail images
+**Problem**: "Python is not recognized"
+- **Solution**: Run the setup script again or install Python manually
 
-### File Naming
-- Automatic sanitization of filenames
-- Preservation of original video titles
-- Unique naming to prevent conflicts
-- Organized folder structure
+**Problem**: "Module not found" error
+- **Solution**: Run `pip install -r requirements.txt` in the application folder
 
-## Configuration
+**Problem**: Application won't start
+- **Solution**: Make sure you're running the start script from the main folder
 
-### Download Settings
-- **Output Directory**: Customizable download location
-- **Quality Selection**: Configurable video quality
-- **Retry Logic**: Automatic retry on failures
-- **Timeout Settings**: Configurable download timeouts
-- **Concurrent Downloads**: Parallel download support
+**Problem**: Downloads fail
+- **Solution**: Check your internet connection and try again
 
-### Browser Settings
-- **User Agent**: Custom user agent to avoid detection
-- **Headers**: Configurable HTTP headers
-- **Cookies**: Session management
-- **Proxy Support**: Optional proxy configuration
+**Problem**: Permission denied (Mac/Linux)
+- **Solution**: Right-click the script and select "Open" or run from terminal
 
-## Error Handling
+### Getting Help
+If you encounter any issues:
+1. Check the troubleshooting section above
+2. Make sure all files are in the correct folders
+3. Try running the setup script again
+4. Contact support with the exact error message
 
-The application includes comprehensive error handling:
-- **Network Errors**: Automatic retry with exponential backoff
-- **Invalid URLs**: Skip invalid or inaccessible videos
-- **Rate Limiting**: Intelligent delays and user agent rotation
-- **Disk Space**: Check available space before downloads
-- **File Conflicts**: Handle duplicate filenames
+## 📝 Notes
 
-## Logging
+- Downloaded videos are saved in the `downloads` folder
+- The application requires an internet connection to download videos
+- Some videos may be protected and cannot be downloaded
+- Always respect copyright and terms of service when downloading content
 
-Detailed logging is provided:
-- **File Logging**: Logs saved to `tiktok_downloader.log`
-- **Console Output**: Real-time progress updates
-- **Error Tracking**: Detailed error messages and stack traces
-- **Download Statistics**: Success/failure rates and performance metrics
+## 🔄 Updates
 
-## GUI Features
+To update the application:
+1. Download the new version
+2. Replace the old files with new ones
+3. Run the setup script again
+4. Your downloaded videos will remain in the downloads folder
 
-### Main Interface
-- **URL Input**: Paste TikTok video URLs
-- **Quality Selection**: Choose download quality
-- **Output Directory**: Select download location
-- **Progress Bar**: Real-time download progress
-- **Status Updates**: Current operation status
+---
 
-### Batch Operations
-- **File Import**: Import URLs from text files
-- **URL List**: Manage multiple URLs
-- **Progress Tracking**: Individual file progress
-- **Results Summary**: Download success/failure summary
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Download Failures**
-   - Check internet connection
-   - Verify TikTok URL validity
-   - Ensure sufficient disk space
-   - Try different quality settings
-
-2. **Browser Issues**
-   - Update Chrome/Chromium
-   - Check ChromeDriver compatibility
-   - Verify system permissions
-   - Clear browser cache
-
-3. **File Access Errors**
-   - Check file permissions
-   - Verify output directory exists
-   - Ensure write access to download location
-   - Close any open files
-
-### Performance Tips
-
-1. **Use Appropriate Quality**: Choose quality based on needs
-2. **Batch Downloads**: Use batch mode for multiple videos
-3. **Stable Internet**: Ensure reliable connection
-4. **Adequate Resources**: Sufficient RAM and CPU
-5. **Regular Updates**: Keep dependencies updated
-
-## Legal and Ethical Considerations
-
-- **Terms of Service**: Respect TikTok's terms of service
-- **Rate Limiting**: Use reasonable download rates
-- **Content Rights**: Respect copyright and content ownership
-- **Personal Use**: Intended for personal, educational, or research purposes
-- **Data Privacy**: Handle user data responsibly
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## License
-
-This project is for educational and personal use. Please respect TikTok's terms of service and applicable laws.
-
-## Support
-
-For issues and questions:
-1. Check the documentation in the `docs/` folder
-2. Review the troubleshooting section
-3. Check existing issues
-4. Create a new issue with detailed information
-
-## Changelog
-
-### Version 1.0.0
-- Initial release
-- Single video download functionality
-- Batch download capability
-- GUI interface
-- Quality selection options
-- Comprehensive error handling
-- Detailed logging and progress tracking
+**Enjoy downloading your favorite videos!** 🎉
 
