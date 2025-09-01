@@ -1,0 +1,7 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+Don't write test for this project at all just write test for the function if I ask you.

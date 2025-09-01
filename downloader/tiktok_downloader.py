@@ -273,6 +273,9 @@ class TikTokDownloader:
                     if content_length > current_width:
                         self.worksheet.column_dimensions[column_letter].width = min(content_length + 2, 50)
             
+            # Save the Excel file immediately after adding metadata
+            self.workbook.save(str(self.excel_file))
+            
             logger.info(f"Added metadata to Excel: {info.get('title', 'Unknown')}")
             
         except Exception as e:
@@ -403,6 +406,8 @@ class TikTokDownloader:
         if not self.custom_base_name:
             return 1
         
+        max_number = 0
+        
         # Check if Excel file exists and has data
         if self.excel_file.exists():
             try:
@@ -414,30 +419,29 @@ class TikTokDownloader:
                 # Find the last row with data
                 last_row = ws.max_row
                 if last_row > 1:  # Skip header row
-                    # Check the last few rows for video numbers
-                    for row in range(last_row, 1, -1):
+                    # Check all rows for video numbers
+                    for row in range(2, last_row + 1):
                         download_path = ws.cell(row=row, column=len(self.headers)).value
                         if download_path and self.custom_base_name in str(download_path):
                             # Extract number from filename like "tiktok_video__1.mp4"
                             import re
                             match = re.search(rf'{re.escape(self.custom_base_name)}__(\d+)', str(download_path))
                             if match:
-                                return int(match.group(1)) + 1
+                                max_number = max(max_number, int(match.group(1)))
             except Exception as e:
                 logger.warning(f"Could not read Excel file to find video number: {e}")
         
         # Check existing files in output directory
         existing_files = list(self.output_dir.glob(f"{self.custom_base_name}__*.*"))
         if existing_files:
-            max_number = 0
             for file in existing_files:
                 import re
                 match = re.search(rf'{re.escape(self.custom_base_name)}__(\d+)', file.name)
                 if match:
                     max_number = max(max_number, int(match.group(1)))
-            return max_number + 1
         
-        return 1
+        logger.info(f"Next video number will be: {max_number + 1}")
+        return max_number + 1
     
     def is_url_already_downloaded(self, url: str) -> bool:
         """
@@ -450,6 +454,7 @@ class TikTokDownloader:
             bool: True if URL already exists in Excel, False otherwise
         """
         if not self.excel_file.exists():
+            logger.info(f"Excel file doesn't exist yet, URL not downloaded: {url}")
             return False
         
         try:
@@ -458,15 +463,26 @@ class TikTokDownloader:
             wb = load_workbook(str(self.excel_file))
             ws = wb.active
             
+            logger.info(f"Checking Excel file for URL: {url}")
+            logger.info(f"Excel file has {ws.max_row} rows")
+            
             # Check if URL exists in the "Original URL" column (column 16)
             for row in range(2, ws.max_row + 1):
                 existing_url = ws.cell(row=row, column=16).value
-                if existing_url == url:
+                logger.info(f"Row {row}: existing URL = {existing_url}")
+                
+                if existing_url and str(existing_url).strip() == url.strip():
+                    logger.info(f"URL already exists in Excel: {url}")
+                    wb.close()
                     return True
+            
+            wb.close()
+            logger.info(f"URL not found in Excel: {url}")
+            return False
+            
         except Exception as e:
             logger.warning(f"Could not check Excel file for existing URL: {e}")
-        
-        return False
+            return False
     
     def validate_url(self, url: str) -> bool:
         """
@@ -526,15 +542,12 @@ class TikTokDownloader:
             print(f"{Fore.RED}Error: Invalid TikTok URL provided{Style.RESET_ALL}")
             return False
         
-        # Check if URL has already been downloaded
-        if self.is_url_already_downloaded(url):
-            logger.info(f"URL already downloaded: {url}")
-            print(f"{Fore.YELLOW}Warning: This video has already been downloaded{Style.RESET_ALL}")
-            return True
+        # Note: URL already downloaded check is now done in the GUI before calling this method
         
         try:
             print(f"{Fore.CYAN}Starting download for: {url}{Style.RESET_ALL}")
             logger.info(f"Starting download for URL: {url}")
+            logger.info(f"Current video counter: {self.video_counter}")
             
             with yt_dlp.YoutubeDL(self.ydl_opts) as ydl:
                 # Extract info first
@@ -587,6 +600,7 @@ class TikTokDownloader:
                 
                 print(f"{Fore.GREEN}Download completed successfully!{Style.RESET_ALL}")
                 logger.info("Download completed successfully")
+                logger.info(f"Video counter after download: {self.video_counter}")
                 return True
                 
         except yt_dlp.DownloadError as e:

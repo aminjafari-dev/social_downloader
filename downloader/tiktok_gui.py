@@ -18,6 +18,7 @@ from typing import Optional
 import yt_dlp
 from colorama import Fore, Style
 import re
+import openpyxl
 
 # Import our downloader class
 from tiktok_downloader import TikTokDownloader
@@ -90,6 +91,9 @@ class TikTokDownloaderGUI:
         # URL input section
         self.create_url_section(main_frame)
         
+        # Excel import section
+        self.create_excel_import_section(main_frame)
+        
         # Options section
         self.create_options_section(main_frame)
         
@@ -136,11 +140,54 @@ class TikTokDownloaderGUI:
         self.batch_text.grid(row=2, column=0, columnspan=4, sticky=(tk.W, tk.E), pady=(10, 0))
         self.batch_text.grid_remove()  # Hidden by default
     
+    def create_excel_import_section(self, parent):
+        """Create Excel import section."""
+        # Excel import frame
+        excel_frame = ttk.LabelFrame(parent, text="Excel File Import", padding="10")
+        excel_frame.grid(row=2, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 10))
+        excel_frame.columnconfigure(1, weight=1)
+        
+        # Excel file selection
+        ttk.Label(excel_frame, text="Excel File:").grid(row=0, column=0, sticky=tk.W, padx=(0, 10))
+        
+        self.excel_file_var = tk.StringVar()
+        excel_entry = ttk.Entry(excel_frame, textvariable=self.excel_file_var, width=50)
+        excel_entry.grid(row=0, column=1, sticky=(tk.W, tk.E), padx=(0, 10))
+        
+        browse_excel_btn = ttk.Button(excel_frame, text="Browse", command=self.browse_excel_file)
+        browse_excel_btn.grid(row=0, column=2, padx=(0, 10))
+        
+        load_excel_btn = ttk.Button(excel_frame, text="Load Columns", command=self.load_excel_columns)
+        load_excel_btn.grid(row=0, column=3)
+        
+        # URL column selection
+        ttk.Label(excel_frame, text="URL Column:").grid(row=1, column=0, sticky=tk.W, padx=(0, 10), pady=(10, 0))
+        
+        self.url_column_var = tk.StringVar()
+        self.url_column_combo = ttk.Combobox(excel_frame, textvariable=self.url_column_var, 
+                                           state="readonly", width=20)
+        self.url_column_combo.grid(row=1, column=1, sticky=tk.W, padx=(0, 10), pady=(10, 0))
+        
+        # Preview button
+        preview_btn = ttk.Button(excel_frame, text="Preview URLs", command=self.preview_excel_urls)
+        preview_btn.grid(row=1, column=2, padx=(0, 10), pady=(10, 0))
+        
+        # Download from Excel button
+        download_excel_btn = ttk.Button(excel_frame, text="Download from Excel", 
+                                      command=self.start_excel_download, style='Accent.TButton')
+        download_excel_btn.grid(row=1, column=3, pady=(10, 0))
+        
+        # Status label for Excel import
+        self.excel_status_var = tk.StringVar(value="No Excel file selected")
+        excel_status_label = ttk.Label(excel_frame, textvariable=self.excel_status_var, 
+                                     font=('Arial', 9), foreground='gray')
+        excel_status_label.grid(row=2, column=0, columnspan=4, sticky=tk.W, pady=(5, 0))
+    
     def create_options_section(self, parent):
         """Create download options section."""
         # Options frame
         options_frame = ttk.LabelFrame(parent, text="Download Options", padding="10")
-        options_frame.grid(row=2, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 10))
+        options_frame.grid(row=3, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 10))
         
         # Output directory
         ttk.Label(options_frame, text="Output Directory:").grid(row=0, column=0, sticky=tk.W, padx=(0, 10))
@@ -202,7 +249,7 @@ class TikTokDownloaderGUI:
         """Create download control section."""
         # Download frame
         download_frame = ttk.Frame(parent)
-        download_frame.grid(row=3, column=0, columnspan=3, pady=(0, 10))
+        download_frame.grid(row=4, column=0, columnspan=3, pady=(0, 10))
         
         # Download button
         self.download_btn = ttk.Button(download_frame, text="Download Video", 
@@ -217,10 +264,10 @@ class TikTokDownloaderGUI:
         """Create progress and log section."""
         # Progress frame
         progress_frame = ttk.LabelFrame(parent, text="Progress & Log", padding="10")
-        progress_frame.grid(row=4, column=0, columnspan=3, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 10))
+        progress_frame.grid(row=5, column=0, columnspan=3, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 10))
         progress_frame.columnconfigure(0, weight=1)
         progress_frame.rowconfigure(1, weight=1)
-        parent.rowconfigure(4, weight=1)
+        parent.rowconfigure(5, weight=1)
         
         # Progress bar
         self.progress_var = tk.DoubleVar()
@@ -240,7 +287,7 @@ class TikTokDownloaderGUI:
         """Create status bar."""
         self.status_var = tk.StringVar(value="Ready")
         status_bar = ttk.Label(parent, textvariable=self.status_var, relief=tk.SUNKEN, anchor=tk.W)
-        status_bar.grid(row=5, column=0, columnspan=3, sticky=(tk.W, tk.E))
+        status_bar.grid(row=6, column=0, columnspan=3, sticky=(tk.W, tk.E))
     
     def toggle_batch_mode(self):
         """Toggle between single URL and batch mode."""
@@ -274,6 +321,195 @@ class TikTokDownloaderGUI:
         directory = filedialog.askdirectory(initialdir=self.output_dir_var.get())
         if directory:
             self.output_dir_var.set(directory)
+    
+    def browse_excel_file(self):
+        """Browse for Excel file."""
+        file_path = filedialog.askopenfilename(
+            title="Select Excel File",
+            filetypes=[
+                ("Excel files", "*.xlsx *.xls"),
+                ("All files", "*.*")
+            ]
+        )
+        if file_path:
+            self.excel_file_var.set(file_path)
+            self.excel_status_var.set(f"Selected: {os.path.basename(file_path)}")
+    
+    def load_excel_columns(self):
+        """Load column names from Excel file."""
+        excel_path = self.excel_file_var.get().strip()
+        if not excel_path:
+            messagebox.showerror("Error", "Please select an Excel file first")
+            return
+        
+        if not os.path.exists(excel_path):
+            messagebox.showerror("Error", "Selected file does not exist")
+            return
+        
+        try:
+            # Read Excel file to get column names using openpyxl
+            wb = openpyxl.load_workbook(excel_path, read_only=True)
+            ws = wb.active
+            
+            # Get column names from first row
+            columns = []
+            for col in range(1, ws.max_column + 1):
+                cell_value = ws.cell(row=1, column=col).value
+                if cell_value:
+                    columns.append(str(cell_value))
+            
+            wb.close()
+            
+            # Update combobox with column names
+            self.url_column_combo['values'] = columns
+            
+            # Try to auto-select URL column
+            url_columns = [col for col in columns if 'url' in col.lower()]
+            if url_columns:
+                self.url_column_var.set(url_columns[0])
+                self.excel_status_var.set(f"Found {len(columns)} columns, auto-selected: {url_columns[0]}")
+            else:
+                self.excel_status_var.set(f"Found {len(columns)} columns, please select URL column")
+            
+            self.log_message(f"Loaded Excel file with {len(columns)} columns")
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to load Excel file: {str(e)}")
+            self.log_message(f"Error loading Excel file: {str(e)}", "ERROR")
+    
+    def preview_excel_urls(self):
+        """Preview URLs from selected column."""
+        excel_path = self.excel_file_var.get().strip()
+        url_column = self.url_column_var.get().strip()
+        
+        if not excel_path or not url_column:
+            messagebox.showerror("Error", "Please select Excel file and URL column first")
+            return
+        
+        try:
+            # Read Excel file using openpyxl
+            wb = openpyxl.load_workbook(excel_path, read_only=True)
+            ws = wb.active
+            
+            # Find the column index for the URL column
+            url_col_idx = None
+            for col in range(1, ws.max_column + 1):
+                cell_value = ws.cell(row=1, column=col).value
+                if cell_value and str(cell_value).strip() == url_column:
+                    url_col_idx = col
+                    break
+            
+            if url_col_idx is None:
+                wb.close()
+                messagebox.showerror("Error", f"Column '{url_column}' not found in Excel file")
+                return
+            
+            # Get URLs from selected column
+            urls = []
+            for row in range(2, ws.max_row + 1):
+                cell_value = ws.cell(row=row, column=url_col_idx).value
+                if cell_value:
+                    urls.append(str(cell_value).strip())
+            
+            wb.close()
+            
+            valid_urls = self.validate_urls(urls)
+            
+            # Show preview dialog
+            preview_text = f"Total URLs in column '{url_column}': {len(urls)}\n"
+            preview_text += f"Valid TikTok URLs: {len(valid_urls)}\n\n"
+            preview_text += "First 5 URLs:\n"
+            
+            for i, url in enumerate(valid_urls[:5], 1):
+                preview_text += f"{i}. {url}\n"
+            
+            if len(valid_urls) > 5:
+                preview_text += f"... and {len(valid_urls) - 5} more URLs"
+            
+            messagebox.showinfo("URL Preview", preview_text)
+            self.log_message(f"Preview: {len(valid_urls)} valid URLs found in Excel")
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to preview URLs: {str(e)}")
+            self.log_message(f"Error previewing URLs: {str(e)}", "ERROR")
+    
+    def get_excel_urls(self) -> list:
+        """Get URLs from Excel file."""
+        excel_path = self.excel_file_var.get().strip()
+        url_column = self.url_column_var.get().strip()
+        
+        if not excel_path or not url_column:
+            return []
+        
+        try:
+            # Read Excel file using openpyxl
+            wb = openpyxl.load_workbook(excel_path, read_only=True)
+            ws = wb.active
+            
+            # Find the column index for the URL column
+            url_col_idx = None
+            for col in range(1, ws.max_column + 1):
+                cell_value = ws.cell(row=1, column=col).value
+                if cell_value and str(cell_value).strip() == url_column:
+                    url_col_idx = col
+                    break
+            
+            if url_col_idx is None:
+                wb.close()
+                self.log_message(f"Column '{url_column}' not found in Excel file", "ERROR")
+                return []
+            
+            # Get URLs from selected column
+            urls = []
+            for row in range(2, ws.max_row + 1):
+                cell_value = ws.cell(row=row, column=url_col_idx).value
+                if cell_value:
+                    urls.append(str(cell_value).strip())
+            
+            wb.close()
+            
+            valid_urls = self.validate_urls(urls)
+            
+            return valid_urls
+            
+        except Exception as e:
+            self.log_message(f"Error reading Excel file: {str(e)}", "ERROR")
+            return []
+    
+    def start_excel_download(self):
+        """Start download process from Excel file."""
+        urls = self.get_excel_urls()
+        
+        if not urls:
+            messagebox.showerror("Error", "No valid TikTok URLs found in Excel file")
+            return
+        
+        # Check for duplicate URLs
+        unique_urls = []
+        duplicate_urls = []
+        for url in urls:
+            if url in unique_urls:
+                duplicate_urls.append(url)
+            else:
+                unique_urls.append(url)
+        
+        if duplicate_urls:
+            self.log_message(f"Removed {len(duplicate_urls)} duplicate URLs from Excel", "WARNING")
+        
+        if not unique_urls:
+            messagebox.showerror("Error", "No unique URLs to download from Excel")
+            return
+        
+        # Update UI state
+        self.download_btn.config(state=tk.DISABLED)
+        self.stop_btn.config(state=tk.NORMAL)
+        self.progress_bar.start()
+        self.status_var.set("Downloading from Excel...")
+        
+        # Start download thread
+        self.download_thread = threading.Thread(target=self.download_worker, args=(unique_urls,))
+        self.download_thread.daemon = True
+        self.download_thread.start()
     
     def clear_log(self):
         """Clear log text area."""
@@ -400,6 +636,12 @@ class TikTokDownloaderGUI:
                 excel_path = self.downloader.output_dir / excel_filename
                 self.downloader.excel_file = excel_path
                 self.log_message("Excel export enabled")
+                
+                # Clear any existing data in the Excel file for fresh batch
+                self.downloader.workbook = openpyxl.Workbook()
+                self.downloader.worksheet = self.downloader.workbook.active
+                self.downloader.worksheet.title = "TikTok Videos Metadata"
+                self.downloader._setup_excel_headers()
             
             # Create output directory
             self.downloader.output_dir.mkdir(exist_ok=True)
@@ -413,11 +655,19 @@ class TikTokDownloaderGUI:
                 self.log_message(f"Processing video {i}/{len(urls)}: {url}")
                 
                 try:
+                    # Check if URL is already downloaded before attempting download
+                    if self.downloader.is_url_already_downloaded(url):
+                        self.log_message(f"Video {i} already downloaded, skipping", "INFO")
+                        continue
+                    
+                    self.log_message(f"Starting download for video {i}...", "INFO")
                     success = self.downloader.download_video(url)
+                    
                     if success:
                         self.log_message(f"Successfully downloaded video {i}", "SUCCESS")
                     else:
                         self.log_message(f"Failed to download video {i}", "ERROR")
+                        
                 except Exception as e:
                     self.log_message(f"Error downloading video {i}: {str(e)}", "ERROR")
             
