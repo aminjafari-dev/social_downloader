@@ -53,9 +53,9 @@ class DownloadSettingsComponent:
         # Initialize variables with default values
         self.output_dir_var = tk.StringVar(value="downloads")
         self.quality_var = tk.StringVar(value="best")
-        self.custom_name_var = tk.StringVar()
+        self.custom_name_var = tk.StringVar(value="tiktok_video")  # Set default custom name
         self.audio_only_var = tk.BooleanVar()
-        self.metadata_var = tk.BooleanVar(value=True)
+        self.metadata_var = tk.BooleanVar(value=False)  # Changed to False by default
         self.excel_export_var = tk.BooleanVar(value=True)
         
         self.frame = None
@@ -95,7 +95,7 @@ class DownloadSettingsComponent:
         audio_check = ttk.Checkbutton(self.frame, text="Audio Only", variable=self.audio_only_var)
         audio_check.grid(row=3, column=0, sticky=tk.W, pady=(0, 5))
         
-        self.metadata_var = tk.BooleanVar(value=True)
+        self.metadata_var = tk.BooleanVar(value=False)  # Changed to False by default
         metadata_check = ttk.Checkbutton(self.frame, text="Add Metadata", variable=self.metadata_var)
         metadata_check.grid(row=3, column=1, sticky=tk.W, padx=(10, 0), pady=(0, 5))
         
@@ -163,9 +163,9 @@ class DownloadSettingsComponent:
         """Reset all settings to their default values."""
         self.output_dir_var.set("downloads")
         self.quality_var.set("best")
-        self.custom_name_var.set("")
+        self.custom_name_var.set("tiktok_video")  # Updated default custom name
         self.audio_only_var.set(False)
-        self.metadata_var.set(True)
+        self.metadata_var.set(False)  # Updated to False by default
         self.excel_export_var.set(True)
     
     def validate_settings(self) -> tuple[bool, str]:

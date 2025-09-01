@@ -112,8 +112,8 @@ class TikTokDownloaderModularGUI:
             output_dir="downloads",
             quality="best",
             extract_audio=False,
-            add_metadata=True,
-            custom_base_name=None,
+            add_metadata=False,  # Changed to False by default
+            custom_base_name="tiktok_video",  # Added default custom name
             platform="tiktok"
         )
         
