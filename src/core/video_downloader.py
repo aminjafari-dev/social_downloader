@@ -108,6 +108,20 @@ class VideoDownloader:
         """
         if self.custom_base_name:
             filename = f"{self.custom_base_name}__{self.video_counter}.%(ext)s"
+            return filename
+        else:
+            return '%(title)s.%(ext)s'
+    
+    def _get_custom_filename_with_increment(self) -> str:
+        """
+        Generate custom filename for videos and increment the counter.
+        This should only be used when actually downloading, not when getting info.
+        
+        Returns:
+            str: Custom filename template
+        """
+        if self.custom_base_name:
+            filename = f"{self.custom_base_name}__{self.video_counter}.%(ext)s"
             self.video_counter += 1
             return filename
         else:
@@ -201,7 +215,12 @@ class VideoDownloader:
         try:
             logger.info(f"Starting download for: {url}")
             
-            with yt_dlp.YoutubeDL(self.ydl_opts) as ydl:
+            # Create a temporary yt-dlp instance with incrementing filename for actual download
+            download_opts = self.ydl_opts.copy()
+            if self.custom_base_name:
+                download_opts['outtmpl'] = str(self.output_dir / self._get_custom_filename_with_increment())
+            
+            with yt_dlp.YoutubeDL(download_opts) as ydl:
                 # Extract info first
                 info = ydl.extract_info(url, download=False)
                 if not info:
@@ -248,6 +267,38 @@ class VideoDownloader:
         logger.info(f"Batch download completed! Successful: {successful}/{len(urls)}")
         
         return results
+    
+    def get_download_path(self, info: Dict[str, Any]) -> str:
+        """
+        Get the expected download path for a video based on its info.
+        
+        Args:
+            info (Dict[str, Any]): Video information dictionary
+            
+        Returns:
+            str: Expected download path for the video
+        """
+        if not info:
+            return ""
+        
+        # Get file extension
+        ext = info.get('ext', 'mp4')
+        
+        if self.custom_base_name:
+            # For custom names, we need to find the actual file that was downloaded
+            # Since the counter was incremented during download, we need to find the file
+            # with the current counter - 1 (since it was incremented after the filename was generated)
+            current_counter = self.video_counter - 1
+            filename = f"{self.custom_base_name}__{current_counter}.{ext}"
+            return str(self.output_dir / filename)
+        else:
+            # For default naming, use the title
+            title = info.get('title', 'Unknown')
+            # Clean the title for filename
+            import re
+            clean_title = re.sub(r'[<>:"/\\|?*]', '', title)
+            filename = f"{clean_title}.{ext}"
+            return str(self.output_dir / filename)
     
     def update_settings(self, output_dir: str = None, quality: str = None, 
                        extract_audio: bool = None, add_metadata: bool = None,

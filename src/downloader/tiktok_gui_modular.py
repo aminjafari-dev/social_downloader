@@ -366,12 +366,37 @@ class TikTokDownloaderModularGUI:
             for i, url in enumerate(urls, 1):
                 self.components['log'].log_message(f"URL {i}: {url}", "INFO")
             
-            # Download videos using the download manager
-            self.components['log'].log_message("Calling download_multiple_videos...", "INFO")
-            results = self.download_manager.download_multiple_videos(
-                urls, 
-                export_to_excel=settings['export_to_excel']
-            )
+            # Use different download method based on source and settings
+            # Always use Excel-optimized method when export_to_excel is enabled
+            # or when the source is explicitly Excel
+            use_excel_method = (source == "Excel" or settings.get('export_to_excel', False))
+            
+            self.components['log'].log_message(f"Source: {source}, Export to Excel: {settings.get('export_to_excel', False)}", "INFO")
+            self.components['log'].log_message(f"Using Excel method: {use_excel_method}", "INFO")
+            
+            if use_excel_method:
+                # Use the new Excel-specific method for better metadata handling
+                self.components['log'].log_message("Using Excel-optimized download method...", "INFO")
+                
+                # Create a progress callback for Excel downloads
+                def progress_callback(current: int, total: int, video_title: str = ""):
+                    self.root.after(0, lambda: self.components['excel_integration'].update_download_progress(
+                        current, total, video_title
+                    ))
+                
+                # Pass the progress callback to the download method
+                results = self.download_manager.download_videos_from_excel(
+                    urls, 
+                    export_to_excel=settings['export_to_excel'],
+                    progress_callback=progress_callback
+                )
+            else:
+                # Use the standard method for other sources
+                self.components['log'].log_message("Using standard download method...", "INFO")
+                results = self.download_manager.download_multiple_videos(
+                    urls, 
+                    export_to_excel=settings['export_to_excel']
+                )
             
             self.components['log'].log_message(f"Download results: {results}", "INFO")
             
@@ -386,6 +411,12 @@ class TikTokDownloaderModularGUI:
                     f"Excel file saved: {results['excel_file']}", 
                     "SUCCESS"
                 )
+            
+            # Update Excel integration component status if it was an Excel download
+            if source == "Excel":
+                self.root.after(0, lambda: self.components['excel_integration'].set_status_message(
+                    f"Download completed: {results['successful']}/{results['valid_urls']} videos processed successfully"
+                ))
             
         except Exception as e:
             self.components['log'].log_message(f"Unexpected error: {str(e)}", "ERROR")

@@ -187,6 +187,22 @@ class ExcelIntegrationComponent:
             messagebox.showerror("Error", "No valid TikTok URLs found in Excel file")
             return
         
+        # Show confirmation with URL count
+        url_count = len(urls)
+        confirm = messagebox.askyesno(
+            "Confirm Excel Download", 
+            f"Found {url_count} valid TikTok URL(s) in the Excel file.\n\n"
+            f"This will download each video individually and update the Excel file "
+            f"with metadata after each successful download.\n\n"
+            f"Continue with the download?"
+        )
+        
+        if not confirm:
+            return
+        
+        # Update status
+        self.set_status_message(f"Starting download of {url_count} videos from Excel...")
+        
         # Trigger callback if available
         if hasattr(self, 'on_excel_download_start'):
             self.on_excel_download_start(urls)
@@ -287,6 +303,24 @@ class ExcelIntegrationComponent:
         else:
             # Reset to blue for normal messages
             self.frame.winfo_children()[-1].configure(foreground="blue")
+    
+    def update_download_progress(self, current: int, total: int, video_title: str = ""):
+        """
+        Update the download progress display.
+        
+        Args:
+            current (int): Current video number being processed
+            total (int): Total number of videos to process
+            video_title (str): Title of the current video being processed
+        """
+        if video_title:
+            # Truncate long titles for display
+            display_title = video_title[:50] + "..." if len(video_title) > 50 else video_title
+            progress_message = f"Processing video {current}/{total}: {display_title}"
+        else:
+            progress_message = f"Processing video {current}/{total}"
+        
+        self.set_status_message(progress_message)
     
     def clear_selection(self):
         """Clear the current Excel file and column selection."""
