@@ -47,6 +47,10 @@ class TikTokDownloaderGUI:
         self.downloader = TikTokDownloader()
         self.message_queue = queue.Queue()
         
+        # Excel export variables
+        self.excel_export_var = tk.BooleanVar(value=True)
+        self.excel_filename_var = tk.StringVar(value="tiktok_videos_metadata.xlsx")
+        
         # Configure styles
         self.setup_styles()
         
@@ -166,6 +170,23 @@ class TikTokDownloaderGUI:
         self.metadata_var = tk.BooleanVar(value=True)
         metadata_check = ttk.Checkbutton(options_frame, text="Include Metadata", variable=self.metadata_var)
         metadata_check.grid(row=2, column=0, columnspan=3, sticky=tk.W, pady=(10, 0))
+        
+        # Excel export checkbox
+        self.excel_export_var = tk.BooleanVar(value=True)
+        excel_check = ttk.Checkbutton(options_frame, text="Export to Excel", variable=self.excel_export_var)
+        excel_check.grid(row=3, column=0, columnspan=3, sticky=tk.W, pady=(10, 0))
+        
+        # Excel filename
+        ttk.Label(options_frame, text="Excel Filename:").grid(row=4, column=0, sticky=tk.W, padx=(0, 10), pady=(10, 0))
+        
+        self.excel_filename_var = tk.StringVar(value="tiktok_videos_metadata.xlsx")
+        excel_entry = ttk.Entry(options_frame, textvariable=self.excel_filename_var, width=30)
+        excel_entry.grid(row=4, column=1, sticky=tk.W, padx=(0, 10), pady=(10, 0))
+        
+        # Process existing button
+        process_existing_btn = ttk.Button(options_frame, text="Process Existing Downloads", 
+                                        command=self.process_existing_downloads)
+        process_existing_btn.grid(row=5, column=0, columnspan=3, sticky=tk.W, pady=(10, 0))
     
     def create_download_section(self, parent):
         """Create download control section."""
@@ -330,6 +351,12 @@ class TikTokDownloaderGUI:
             self.downloader.add_metadata = self.metadata_var.get()
             self.downloader.ydl_opts = self.downloader._configure_ydl_options()
             
+            # Set Excel export settings
+            if self.excel_export_var.get():
+                excel_path = self.downloader.output_dir / self.excel_filename_var.get()
+                self.downloader.excel_file = excel_path
+                self.log_message("Excel export enabled")
+            
             # Create output directory
             self.downloader.output_dir.mkdir(exist_ok=True)
             
@@ -350,6 +377,15 @@ class TikTokDownloaderGUI:
                 except Exception as e:
                     self.log_message(f"Error downloading video {i}: {str(e)}", "ERROR")
             
+            # Save Excel file if enabled
+            if self.excel_export_var.get():
+                self.log_message("Saving Excel file with metadata...")
+                try:
+                    self.downloader.save_excel_file()
+                    self.log_message(f"Excel file saved: {self.downloader.excel_file}", "SUCCESS")
+                except Exception as e:
+                    self.log_message(f"Error saving Excel file: {str(e)}", "ERROR")
+            
             self.log_message("Download process completed", "SUCCESS")
             
         except Exception as e:
@@ -365,6 +401,42 @@ class TikTokDownloaderGUI:
         self.stop_btn.config(state=tk.DISABLED)
         self.progress_bar.stop()
         self.status_var.set("Ready")
+    
+    def process_existing_downloads(self):
+        """Process existing downloads and create Excel file."""
+        try:
+            # Update downloader settings
+            self.downloader.output_dir = Path(self.output_dir_var.get())
+            
+            # Set Excel filename if specified
+            if self.excel_filename_var.get():
+                excel_path = self.downloader.output_dir / self.excel_filename_var.get()
+                self.downloader.excel_file = excel_path
+            
+            self.log_message("Processing existing downloads for Excel export...")
+            self.status_var.set("Processing existing downloads...")
+            
+            # Process in separate thread
+            process_thread = threading.Thread(target=self.process_existing_worker)
+            process_thread.daemon = True
+            process_thread.start()
+            
+        except Exception as e:
+            self.log_message(f"Error starting process: {str(e)}", "ERROR")
+    
+    def process_existing_worker(self):
+        """Worker thread for processing existing downloads."""
+        try:
+            self.downloader.process_existing_downloads()
+            self.log_message("Successfully processed existing downloads", "SUCCESS")
+            self.log_message(f"Excel file saved: {self.downloader.excel_file}", "SUCCESS")
+            
+        except Exception as e:
+            self.log_message(f"Error processing existing downloads: {str(e)}", "ERROR")
+        
+        finally:
+            # Update UI on main thread
+            self.root.after(0, lambda: self.status_var.set("Ready"))
     
     def run(self):
         """Start the GUI application."""
