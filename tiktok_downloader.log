@@ -35,3 +35,40 @@
 2025-09-01 15:13:04,939 - INFO - Added metadata to Excel: Ranking The Best Baby Moments (Part 2) #cute #baby #adorable #funny#t...
 2025-09-01 15:13:04,939 - INFO - Download completed successfully
 2025-09-01 15:13:04,958 - INFO - Excel file saved: downloads/tiktok_videos_metadata.xlsx
+2025-09-01 15:17:30,203 - INFO - Added metadata to Excel: Ranking The Best Baby Moments (Part 2) #cute #baby #adorable #funny#t...
+2025-09-01 15:17:30,233 - INFO - Excel file saved: downloads/tiktok_videos_metadata_20250901_151730.xlsx
+2025-09-01 15:35:46,825 - INFO - Starting download for URL: https://www.tiktok.com/@tonsrankings/video/7525496313627053367
+2025-09-01 15:35:49,764 - INFO - Added metadata to Excel: Ranking The Best Baby Moments (Part 2) #cute #baby #adorable #funny#t...
+2025-09-01 15:35:49,764 - INFO - Download completed successfully
+2025-09-01 15:35:49,780 - INFO - Excel file saved: downloads/tiktok_videos_metadata.xlsx
+2025-09-01 15:36:32,922 - INFO - Starting download for URL: https://www.tiktok.com/@tonsrankings/video/7525496313627053367
+2025-09-01 15:36:44,773 - INFO - Added metadata to Excel: Ranking The Best Baby Moments (Part 2) #cute #baby #adorable #funny#t...
+2025-09-01 15:36:44,774 - INFO - Download completed successfully
+2025-09-01 15:36:44,799 - INFO - Excel file saved: downloads/tiktok_videos_metadata.xlsx
+2025-09-01 15:39:32,991 - INFO - Starting download for URL: https://www.tiktok.com/@sunyv8/video/7544443398309170462
+2025-09-01 15:39:54,385 - ERROR - Download error: [0;31mERROR:[0m [TikTok] 7544443398309170462: Unable to download webpage: HTTPSConnectionPool(host='www.tiktok.com', port=443): Read timed out. (read timeout=20.0) (caused by TransportError("HTTPSConnectionPool(host='www.tiktok.com', port=443): Read timed out. (read timeout=20.0)"))
+2025-09-01 15:39:54,396 - INFO - Excel file saved: downloads/tiktok_videos_metadata.xlsx
+2025-09-01 15:40:05,018 - INFO - Starting download for URL: https://www.tiktok.com/@sunyv8/video/7544443398309170462
+2025-09-01 15:40:23,049 - INFO - Added metadata to Excel: Ranking The Best Baby Moments (part 3) #edit #baby
+2025-09-01 15:40:23,050 - INFO - Download completed successfully
+2025-09-01 15:40:23,060 - INFO - Excel file saved: downloads/tiktok_videos_metadata.xlsx
+2025-09-01 15:40:33,467 - INFO - Starting download for URL: https://www.tiktok.com/@sunyv8/video/7544443398309170462
+2025-09-01 15:40:45,539 - INFO - Added metadata to Excel: Ranking The Best Baby Moments (part 3) #edit #baby
+2025-09-01 15:40:45,539 - INFO - Download completed successfully
+2025-09-01 15:40:45,565 - INFO - Excel file saved: downloads/tiktok_videos_metadata.xlsx
+2025-09-01 15:46:38,742 - INFO - Starting download for URL: https://www.tiktok.com/@sunyv8/video/7544443398309170462
+2025-09-01 15:46:47,865 - INFO - Added metadata to Excel: Ranking The Best Baby Moments (part 3) #edit #baby
+2025-09-01 15:46:47,866 - INFO - Download completed successfully
+2025-09-01 15:46:47,884 - INFO - Excel file saved: downloads/tiktok_videos_metadata.xlsx
+2025-09-01 15:54:17,866 - INFO - Starting download for URL: https://www.tiktok.com/@sunyv8/video/7544443398309170462
+2025-09-01 15:55:07,297 - INFO - Added metadata to Excel: Ranking The Best Baby Moments (part 3) #edit #baby
+2025-09-01 15:55:07,297 - INFO - Download completed successfully
+2025-09-01 15:55:07,321 - INFO - Excel file saved: downloads/baby best moments__excel.xlsx
+2025-09-01 15:57:40,633 - INFO - Starting download for URL: https://www.tiktok.com/@sunyv8/video/7544443398309170462
+2025-09-01 15:57:52,683 - INFO - Added metadata to Excel: Ranking The Best Baby Moments (part 3) #edit #baby
+2025-09-01 15:57:52,684 - INFO - Download completed successfully
+2025-09-01 15:57:52,700 - INFO - Excel file saved: downloads/tiktok_video__excel.xlsx
+2025-09-01 15:58:14,936 - INFO - Starting download for URL: https://www.tiktok.com/@goranking3/video/7544901477152607501
+2025-09-01 15:58:42,572 - INFO - Added metadata to Excel: Ranking Baby Maverick Best Moments 😍😍  #maverick #ranking #cute #babi...
+2025-09-01 15:58:42,572 - INFO - Download completed successfully
+2025-09-01 15:58:42,594 - INFO - Excel file saved: downloads/tiktok_video__excel.xlsx

@@ -75,6 +75,8 @@ class TikTokDownloader:
         self.quality = quality
         self.extract_audio = extract_audio
         self.add_metadata = add_metadata
+        self.custom_base_name = None  # For custom naming of videos
+        self.video_counter = 1  # Counter for video numbering
         
         # Create output directory if it doesn't exist
         self.output_dir.mkdir(exist_ok=True)
@@ -314,11 +316,22 @@ class TikTokDownloader:
                 title = info.get('title', '')
                 ext = info.get('ext', 'mp4')
                 
-                # Look for video file with similar name
-                for video_file in self.output_dir.glob(f"*.{ext}"):
-                    if title.lower() in video_file.name.lower():
-                        video_path = str(video_file)
-                        break
+                if self.custom_base_name:
+                    # Look for video file with custom naming pattern
+                    # Since we don't know the exact counter, look for any matching pattern
+                    for video_file in self.output_dir.glob(f"{self.custom_base_name}__*.{ext}"):
+                        # Check if this file corresponds to the current info file
+                        # We'll use the info file name to match (it should have the same base)
+                        info_base = info_file.stem.replace('.info', '')
+                        if info_base in video_file.stem:
+                            video_path = str(video_file)
+                            break
+                else:
+                    # Look for video file with similar name (original behavior)
+                    for video_file in self.output_dir.glob(f"*.{ext}"):
+                        if title.lower() in video_file.name.lower():
+                            video_path = str(video_file)
+                            break
                 
                 # Add to Excel
                 self._add_metadata_to_excel(info, video_path)
@@ -342,7 +355,7 @@ class TikTokDownloader:
             Dict[str, Any]: Configured yt-dlp options dictionary
         """
         options = {
-            'outtmpl': str(self.output_dir / '%(title)s.%(ext)s'),
+            'outtmpl': str(self.output_dir / self._get_custom_filename()),
             'format': 'bestaudio/best' if self.extract_audio else self.quality,
             'writesubtitles': False,
             'writeautomaticsub': False,
@@ -361,6 +374,24 @@ class TikTokDownloader:
             })
         
         return options
+    
+    def _get_custom_filename(self) -> str:
+        """
+        Generate custom filename for videos.
+        
+        Returns:
+            str: Custom filename template
+        """
+        if self.custom_base_name:
+            filename = f"{self.custom_base_name}__{self.video_counter}.%(ext)s"
+            self.video_counter += 1
+            return filename
+        else:
+            return '%(title)s.%(ext)s'
+    
+    def reset_video_counter(self):
+        """Reset the video counter for new batch downloads."""
+        self.video_counter = 1
     
     def validate_url(self, url: str) -> bool:
         """
@@ -440,20 +471,35 @@ class TikTokDownloader:
                 
                 # Get the downloaded file path
                 download_path = ""
-                if info.get('title'):
-                    # Try to find the downloaded file
-                    title = info.get('title', '')
-                    ext = info.get('ext', 'mp4')
-                    possible_filename = f"{title}.{ext}"
+                ext = info.get('ext', 'mp4')
+                
+                if self.custom_base_name:
+                    # Use custom naming pattern
+                    current_counter = self.video_counter - 1  # Adjust for the increment in _get_custom_filename
+                    possible_filename = f"{self.custom_base_name}__{current_counter}.{ext}"
                     download_path = str(self.output_dir / possible_filename)
                     
                     # Check if file exists
                     if not os.path.exists(download_path):
-                        # Try to find any file with similar name
-                        for file in self.output_dir.glob(f"*{ext}"):
-                            if title.lower() in file.name.lower():
+                        # Try to find any file with the custom naming pattern
+                        for file in self.output_dir.glob(f"{self.custom_base_name}__*.{ext}"):
+                            if f"__{current_counter}." in file.name:
                                 download_path = str(file)
                                 break
+                else:
+                    # Use original title-based naming
+                    if info.get('title'):
+                        title = info.get('title', '')
+                        possible_filename = f"{title}.{ext}"
+                        download_path = str(self.output_dir / possible_filename)
+                        
+                        # Check if file exists
+                        if not os.path.exists(download_path):
+                            # Try to find any file with similar name
+                            for file in self.output_dir.glob(f"*{ext}"):
+                                if title.lower() in file.name.lower():
+                                    download_path = str(file)
+                                    break
                 
                 # Add metadata to Excel
                 self._add_metadata_to_excel(info, download_path)

@@ -183,10 +183,20 @@ class TikTokDownloaderGUI:
         excel_entry = ttk.Entry(options_frame, textvariable=self.excel_filename_var, width=30)
         excel_entry.grid(row=4, column=1, sticky=tk.W, padx=(0, 10), pady=(10, 0))
         
+        # Custom naming field
+        ttk.Label(options_frame, text="Custom Base Name:").grid(row=5, column=0, sticky=tk.W, padx=(0, 10), pady=(10, 0))
+        
+        self.custom_name_var = tk.StringVar(value="tiktok_video")
+        custom_name_entry = ttk.Entry(options_frame, textvariable=self.custom_name_var, width=30)
+        custom_name_entry.grid(row=5, column=1, sticky=tk.W, padx=(0, 10), pady=(10, 0))
+        
+        ttk.Label(options_frame, text="(Videos will be named: name__1, name__2, etc.)", 
+                 font=('Arial', 9), foreground='gray').grid(row=5, column=2, sticky=tk.W, padx=(10, 0), pady=(10, 0))
+        
         # Process existing button
         process_existing_btn = ttk.Button(options_frame, text="Process Existing Downloads", 
                                         command=self.process_existing_downloads)
-        process_existing_btn.grid(row=5, column=0, columnspan=3, sticky=tk.W, pady=(10, 0))
+        process_existing_btn.grid(row=6, column=0, columnspan=3, sticky=tk.W, pady=(10, 0))
     
     def create_download_section(self, parent):
         """Create download control section."""
@@ -349,11 +359,29 @@ class TikTokDownloaderGUI:
             self.downloader.quality = self.quality_var.get()
             self.downloader.extract_audio = self.audio_only_var.get()
             self.downloader.add_metadata = self.metadata_var.get()
+            
+            # Reset video counter for new batch
+            self.downloader.reset_video_counter()
+            
             self.downloader.ydl_opts = self.downloader._configure_ydl_options()
+            
+            # Set custom naming and Excel export settings
+            custom_name = self.custom_name_var.get().strip()
+            if custom_name:
+                self.downloader.custom_base_name = custom_name
+                self.log_message(f"Using custom naming: {custom_name}__1, {custom_name}__2, etc.")
+                
+                # Reconfigure ydl_opts with custom naming
+                self.downloader.ydl_opts = self.downloader._configure_ydl_options()
             
             # Set Excel export settings
             if self.excel_export_var.get():
-                excel_path = self.downloader.output_dir / self.excel_filename_var.get()
+                # Use custom name for Excel file with __excel suffix
+                if custom_name:
+                    excel_filename = f"{custom_name}__excel.xlsx"
+                else:
+                    excel_filename = self.excel_filename_var.get()
+                excel_path = self.downloader.output_dir / excel_filename
                 self.downloader.excel_file = excel_path
                 self.log_message("Excel export enabled")
             
@@ -408,8 +436,14 @@ class TikTokDownloaderGUI:
             # Update downloader settings
             self.downloader.output_dir = Path(self.output_dir_var.get())
             
-            # Set Excel filename if specified
-            if self.excel_filename_var.get():
+            # Set custom naming and Excel filename
+            custom_name = self.custom_name_var.get().strip()
+            if custom_name:
+                self.downloader.custom_base_name = custom_name
+                excel_filename = f"{custom_name}__excel.xlsx"
+                excel_path = self.downloader.output_dir / excel_filename
+                self.downloader.excel_file = excel_path
+            elif self.excel_filename_var.get():
                 excel_path = self.downloader.output_dir / self.excel_filename_var.get()
                 self.downloader.excel_file = excel_path
             
