@@ -23,7 +23,7 @@ from typing import List
 
 # Import our modular components
 try:
-    from components import (
+    from .components import (
         VideoURLComponent,
         BatchModeComponent,
         DownloadSettingsComponent,
@@ -31,37 +31,52 @@ try:
         LogComponent
     )
 except ImportError:
-    # Fallback for when running the file directly
-    import sys
-    import os
-    sys.path.append(os.path.join(os.path.dirname(__file__), 'components'))
-    from components import (
-        VideoURLComponent,
-        BatchModeComponent,
-        DownloadSettingsComponent,
-        ExcelIntegrationComponent,
-        LogComponent
-    )
+    try:
+        from components import (
+            VideoURLComponent,
+            BatchModeComponent,
+            DownloadSettingsComponent,
+            ExcelIntegrationComponent,
+            LogComponent
+        )
+    except ImportError:
+        # Fallback for when running the file directly
+        import sys
+        import os
+        sys.path.append(os.path.join(os.path.dirname(__file__), 'components'))
+        from components import (
+            VideoURLComponent,
+            BatchModeComponent,
+            DownloadSettingsComponent,
+            ExcelIntegrationComponent,
+            LogComponent
+        )
 
 # Import core functionality
 try:
-    from core import DownloadManager
+    from ..core import DownloadManager
 except ImportError:
-    # Fallback for when running the file directly
-    import sys
-    import os
-    sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-    from core import DownloadManager
+    try:
+        from core import DownloadManager
+    except ImportError:
+        # Fallback for when running the file directly
+        import sys
+        import os
+        sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+        from core import DownloadManager
 
 # Import Excel utilities
 try:
-    from utils.excel_loader import ExcelLoader
+    from ..utils.excel_loader import ExcelLoader
 except ImportError:
-    # Fallback for when running the file directly
-    import sys
-    import os
-    sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-    from utils.excel_loader import ExcelLoader
+    try:
+        from utils.excel_loader import ExcelLoader
+    except ImportError:
+        # Fallback for when running the file directly
+        import sys
+        import os
+        sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+        from utils.excel_loader import ExcelLoader
 
 # Configure logging
 import logging
@@ -123,23 +138,42 @@ class TikTokDownloaderModularGUI:
         # Main frame
         self.main_frame = ttk.Frame(self.root, padding="10")
         
-        # Title
+        # Title and control buttons
+        title_frame = ttk.Frame(self.main_frame)
+        title_frame.grid(row=0, column=0, columnspan=2, pady=(0, 20), sticky=(tk.W, tk.E))
+        
         title_label = ttk.Label(
-            self.main_frame, 
+            title_frame, 
             text="TikTok Video Downloader - Modular Architecture", 
             style='Title.TLabel'
         )
-        title_label.grid(row=0, column=0, columnspan=2, pady=(0, 20))
+        title_label.pack(side=tk.LEFT)
+        
+        # Control buttons on the right side
+        control_frame = ttk.Frame(title_frame)
+        control_frame.pack(side=tk.RIGHT)
+        
+        ttk.Button(
+            control_frame, 
+            text="Reset All", 
+            command=self._reset_all
+        ).pack(side=tk.LEFT, padx=(0, 10))
+        
+        ttk.Button(
+            control_frame, 
+            text="Exit", 
+            command=self._exit_application
+        ).pack(side=tk.LEFT)
+        
+        # Configure title frame grid weights
+        title_frame.columnconfigure(0, weight=1)
         
         # Create components
         self._create_components()
         
-        # Control buttons
-        self._create_control_buttons()
-        
         # Configure grid weights
         self.main_frame.columnconfigure(0, weight=1)
-        self.main_frame.rowconfigure(6, weight=1)  # Log component row
+        self.main_frame.rowconfigure(5, weight=1)  # Log component row
     
     def _create_components(self):
         """Create all GUI components."""
@@ -177,46 +211,7 @@ class TikTokDownloaderModularGUI:
             row=5, column=0, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(10, 0)
         )
     
-    def _create_control_buttons(self):
-        """Create control buttons for download operations."""
-        control_frame = ttk.Frame(self.main_frame)
-        control_frame.grid(row=6, column=0, columnspan=2, pady=(10, 0))
-        
-        self.download_btn = ttk.Button(
-            control_frame, 
-            text="Start Download", 
-            command=self._start_download
-        )
-        self.download_btn.pack(side=tk.LEFT, padx=(0, 10))
-        
-        self.stop_btn = ttk.Button(
-            control_frame, 
-            text="Stop", 
-            command=self._stop_download, 
-            state=tk.DISABLED
-        )
-        self.stop_btn.pack(side=tk.LEFT, padx=(0, 10))
-        
-        ttk.Button(
-            control_frame, 
-            text="Reset All", 
-            command=self._reset_all
-        ).pack(side=tk.LEFT, padx=(0, 10))
-        
-        ttk.Button(
-            control_frame, 
-            text="Exit", 
-            command=self._exit_application
-        ).pack(side=tk.LEFT)
-    
-    def _setup_layout(self):
-        """Setup the main layout and grid weights."""
-        self.main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
-        
-        # Configure grid weights
-        self.root.columnconfigure(0, weight=1)
-        self.root.rowconfigure(0, weight=1)
-    
+
     def _setup_callbacks(self):
         """Setup callback functions for components."""
         # Set Excel integration callbacks
@@ -225,6 +220,16 @@ class TikTokDownloaderModularGUI:
             on_excel_download_start=self._on_excel_download_start,
             on_process_existing=self._on_process_existing_downloads
         )
+        # Set Video URL component download callback for single URL downloads
+        self.components['video_url'].set_download_callback(self._start_download_with_urls)
+    
+    def _setup_layout(self):
+        """Setup the main layout and grid weights."""
+        self.main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        
+        # Configure grid weights
+        self.root.columnconfigure(0, weight=1)
+        self.root.rowconfigure(0, weight=1)
     
     def _on_excel_columns_loaded(self, columns: List[str]):
         """Callback when Excel columns are loaded."""
@@ -327,21 +332,9 @@ class TikTokDownloaderModularGUI:
             self.components['log'].log_message(f"Traceback: {traceback.format_exc()}", "ERROR")
             return []
     
-    def _start_download(self):
-        """Start download process from input components."""
-        urls = self._get_urls_from_input()
-        
-        if not urls:
-            messagebox.showerror("Error", "Please enter valid TikTok URL(s)")
-            return
-        
-        self._start_download_with_urls(urls, "Input")
-    
     def _start_download_with_urls(self, urls: List[str], source: str):
         """Start download process with specified URLs."""
         # Update UI state
-        self.download_btn.config(state=tk.DISABLED)
-        self.stop_btn.config(state=tk.NORMAL)
         self.components['log'].start_progress()
         self.components['log'].set_status(f"Downloading from {source}...")
         
@@ -352,13 +345,6 @@ class TikTokDownloaderModularGUI:
         )
         self.download_thread.daemon = True
         self.download_thread.start()
-    
-    def _stop_download(self):
-        """Stop download process."""
-        self.components['log'].set_status("Stopping...", is_error=True)
-        # Note: yt-dlp doesn't have a built-in stop mechanism
-        # This is a placeholder for future implementation
-        self._finish_download()
     
     def _download_worker(self, urls: List[str], source: str):
         """Worker thread for downloading videos."""
@@ -413,8 +399,6 @@ class TikTokDownloaderModularGUI:
     
     def _finish_download(self):
         """Finish download process and update UI."""
-        self.download_btn.config(state=tk.NORMAL)
-        self.stop_btn.config(state=tk.DISABLED)
         self.components['log'].stop_progress()
         self.components['log'].set_status("Ready")
     

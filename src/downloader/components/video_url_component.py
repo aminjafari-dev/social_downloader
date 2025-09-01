@@ -2,7 +2,7 @@
 Video URL Component
 
 This component handles the single URL input functionality for the TikTok Downloader GUI.
-It provides a clean interface for users to input individual TikTok video URLs.
+It provides a clean interface for users to input individual TikTok video URLs with a download button.
 
 Usage:
     # Create the component
@@ -13,25 +13,31 @@ Usage:
     
     # Clear the URL input
     url_component.clear_url()
+    
+    # Set download callback
+    url_component.set_download_callback(callback_function)
 """
 
 import tkinter as tk
 from tkinter import ttk
-from typing import Optional
+from typing import Optional, Callable
 
 
 class VideoURLComponent:
     """
-    Component for handling single video URL input.
+    Component for handling single video URL input with download functionality.
     
     This component provides a clean interface for users to input individual TikTok video URLs
-    with validation and clear visual feedback.
+    with validation, clear visual feedback, and a dedicated download button for immediate
+    single URL downloads.
     
     Attributes:
         parent (tk.Widget): Parent widget to contain this component
         url_var (tk.StringVar): Variable to store the URL input
         url_entry (ttk.Entry): Entry widget for URL input
-        frame (ttk.Frame): Main frame containing all URL-related widgets
+        download_btn (ttk.Button): Download button for single URL downloads
+        frame (ttk.LabelFrame): Main frame containing all URL-related widgets
+        download_callback (Callable): Callback function for download operations
     """
     
     def __init__(self, parent: tk.Widget):
@@ -45,6 +51,8 @@ class VideoURLComponent:
         self.url_var = tk.StringVar()
         self.frame = None
         self.url_entry = None
+        self.download_btn = None
+        self.download_callback = None
         
         self._create_widgets()
         self._setup_layout()
@@ -56,8 +64,17 @@ class VideoURLComponent:
         
         # URL input label and entry
         ttk.Label(self.frame, text="Single URL:").grid(row=0, column=0, sticky=tk.W, pady=(0, 5))
-        self.url_entry = ttk.Entry(self.frame, textvariable=self.url_var, width=60)
-        self.url_entry.grid(row=0, column=1, sticky=(tk.W, tk.E), padx=(10, 0), pady=(0, 5))
+        self.url_entry = ttk.Entry(self.frame, textvariable=self.url_var, width=50)
+        self.url_entry.grid(row=0, column=1, sticky=(tk.W, tk.E), padx=(10, 10), pady=(0, 5))
+        
+        # Download button for single URL
+        self.download_btn = ttk.Button(
+            self.frame, 
+            text="Download", 
+            command=self._on_download_click,
+            style='Accent.TButton'
+        )
+        self.download_btn.grid(row=0, column=2, padx=(0, 0), pady=(0, 5))
         
         # Configure grid weights for proper expansion
         self.frame.columnconfigure(1, weight=1)
@@ -66,6 +83,33 @@ class VideoURLComponent:
         """Setup the layout and grid weights."""
         # Grid weights are configured in _create_widgets
         pass
+    
+    def _on_download_click(self):
+        """Handle download button click for single URL download."""
+        url = self.get_url()
+        if not url:
+            # Show error if no URL is entered
+            from tkinter import messagebox
+            messagebox.showerror("Error", "Please enter a valid TikTok URL")
+            return
+        
+        # Call the download callback if set
+        if self.download_callback:
+            self.download_callback([url], "Single URL")
+        else:
+            # Fallback: show message that callback is not set
+            from tkinter import messagebox
+            messagebox.showwarning("Warning", "Download callback not configured")
+    
+    def set_download_callback(self, callback: Callable[[list, str], None]):
+        """
+        Set the download callback function for single URL downloads.
+        
+        Args:
+            callback (Callable[[list, str], None]): Function to call when download button is clicked.
+                                             Should accept a list of URLs and source string as parameters.
+        """
+        self.download_callback = callback
     
     def get_url(self) -> str:
         """
