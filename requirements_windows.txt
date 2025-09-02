@@ -1,4 +1,5 @@
-# TikTok Video Search and Download Requirements
+# Windows-specific requirements for Social Downloader
+# These versions are tested to work with Python 3.13 on Windows
 
 # Core Dependencies
 yt-dlp>=2023.12.30
@@ -11,7 +12,7 @@ webdriver-manager>=4.0.0
 openpyxl>=3.1.0
 fake-useragent>=1.4.0
 
-# Video Processing (for downloads)
+# Video Processing (pre-compiled wheels for Windows)
 opencv-python>=4.8.0
 numpy>=1.26.0
 pillow>=9.0.0
@@ -19,3 +20,5 @@ pillow>=9.0.0
 # Additional dependencies for better compatibility
 setuptools>=65.0.0
 wheel>=0.40.0
+
+

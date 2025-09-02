@@ -50,6 +50,10 @@ The setup script will automatically:
 4. Type: `pip install -r requirements.txt`
 5. Type: `python src/run.py`
 
+**Note**: If you encounter NumPy compilation errors on Windows, try:
+- Run `setup_windows_advanced.bat` instead
+- Or install packages individually: `pip install numpy --only-binary=all`
+
 ### Mac Manual Setup
 1. Install Python using Homebrew: `brew install python`
 2. Open Terminal in the application folder
@@ -110,6 +114,10 @@ social_downloader/
 
 **Problem**: Permission denied (Mac/Linux)
 - **Solution**: Right-click the script and select "Open" or run from terminal
+
+**Problem**: NumPy compilation error on Windows
+- **Solution**: Run `setup_windows_advanced.bat` instead of `setup_windows.bat`
+- **Alternative**: Run `pip install numpy --only-binary=all` manually
 
 ### Getting Help
 If you encounter any issues:
